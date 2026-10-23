@@ -45,17 +45,17 @@ function authorized(request) {
   return timingSafeEqual(Buffer.from(supplied, 'hex'), Buffer.from(token, 'hex'));
 }
 function allowedOrigin(request) {
-  // LG-installed file:// webOS apps normally send Origin: null.
-  // No arbitrary Internet site receives cross-origin read privileges.
+  // Installed LG webOS apps can report Origin: null OR the unique
+  // file://<app-id> security origin. Never allow generic Internet origins.
   const origin = request.headers.origin;
-  return !origin || origin === 'null';
+  return !origin || origin === 'null' || origin === 'file://com.archsgio.iptv';
 }
 function headers(response, req) {
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
   response.setHeader('Cache-Control', 'no-store');
   response.setHeader('X-Content-Type-Options', 'nosniff');
-  if (req.headers.origin === 'null') {
-    response.setHeader('Access-Control-Allow-Origin', 'null');
+  if (req.headers.origin === 'null' || req.headers.origin === 'file://com.archsgio.iptv') {
+    response.setHeader('Access-Control-Allow-Origin', req.headers.origin);
     response.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Montecrestese-Key');
     response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     response.setHeader('Access-Control-Allow-Private-Network', 'true');
