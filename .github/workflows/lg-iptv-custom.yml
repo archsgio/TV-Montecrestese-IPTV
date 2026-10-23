@@ -9,6 +9,10 @@ on:
       - 'webos-player-custom/**'
   workflow_dispatch:
 
+concurrency:
+  group: lg-iptv-ipk-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
