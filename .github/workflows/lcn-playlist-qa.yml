@@ -1,0 +1,26 @@
+name: Montecrestese LCN - playlist static QA
+on:
+  push:
+    branches:
+      - feature/webos-iptv-lcn-focus
+    paths:
+      - '.github/workflows/lcn-playlist-qa.yml'
+      - 'TV_Montecrestese_LCN_v*'
+      - 'Catalogo_LCN_Montecrestese_v*'
+      - 'scripts/audit-playlist-montecrestese.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-playlists:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Checkout playlists and catalog
+        uses: actions/checkout@v4
+      - name: Check Node.js runtime
+        run: node --version
+      - name: Validate LCN and EPG with no network streaming
+        run: node scripts/audit-playlist-montecrestese.mjs
