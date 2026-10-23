@@ -1,0 +1,39 @@
+name: LG Hybrid DVB - safe syntax and official links
+on:
+  push:
+    branches:
+      - feature/webos-iptv-lcn-focus
+    paths:
+      - '.github/workflows/lg-hybrid-qa.yml'
+      - 'tools/lg-hybrid/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check ESM syntax (no TV connection)
+        run: node --check tools/lg-hybrid/lg-dtt.mjs
+      - name: Check official registry and local-only safety invariants
+        run: |
+          node --input-type=module -e "
+            import fs from 'node:fs';
+            const p = 'tools/lg-hybrid/official-fallbacks.json';
+            const o = JSON.parse(fs.readFileSync(p,'utf8'));
+            const allowed = new Set(['official_live','official_info','official_live_page','official_stream_page','official_live_directory']);
+            if (o.schema !== 1 || !Array.isArray(o.entries) || o.entries.length < 10) process.exit(1);
+            const lcn = o.entries.map(e => e.lcn);
+            if (new Set(lcn).size !== lcn.length) process.exit(1);
+            for (const e of o.entries) if (!Number.isInteger(e.lcn)||!allowed.has(e.kind)||!e.url.startsWith('https://')||!e.note) process.exit(1);
+            const code = fs.readFileSync('tools/lg-hybrid/lg-dtt.mjs','utf8');
+            for (const term of ['--list','--tune','--return','--web','privateIPv4','ssap://tv/openChannel','ssap://tv/getChannelList','ssap://system.launcher/open']) if(!code.includes(term)) process.exit(1);
+            console.log('OK: official HTTPS only; 4 explicit actions; local-only host check; no TV connection.');
+          "
