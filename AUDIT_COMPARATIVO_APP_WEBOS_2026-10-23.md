@@ -88,3 +88,38 @@ Il codice `crates/screens/src/number.rs` usa il numero dichiarato dal canale (`t
 - Issue repository aperte per webOS 3.x e recensioni su webOS C5; il README e il changelog contengono alcune indicazioni discordanti sui numeri interni webOS testati. Non assumere compatibilità del modello specifico.
 
 **Verdetto: OTTIMO DONATORE DI IDEE UI, non da installare per risolvere focus/scroll interni dell'app IPTV o numeri fisici.** Include soluzioni semplici e verificabili, da integrare nel fork selettivamente con test Playwright/Chromium legacy. Non cambia la raccomandazione principale: fork del lettore esistente + eventuale tastierino virtuale; evitare root senza necessità provata.
+
+
+## Studio fattibilita: numeri fisici solo dentro IPTV (23 ottobre 2026)
+
+### Conclusione verificata
+
+Un launcher Preact/webOS non privilegiato (Hearth, Free My TV, webOS-vibehack) non può autonomamente far arrivare alla sua UI i tasti numerici fisici riservati da webOS. Il supporto sviluppatori LG lo conferma il **23 ottobre 2026**: https://forum.webostv.developer.lge.com/t/tv2026-impossible-to-use-number-keys/28325 .
+
+L'idea di *modificare prima dell'installazione* è praticabile **solo se la distribuzione comprende anche una componente di intercettazione privilegiata/root**, ad esempio un servizio di input di sistema. Il launcher da solo non costituisce escalation di privilegi.
+
+### Rilevamento concreto in Magic Mapper (supera l'ipotesi generica precedente)
+
+- Repository https://github.com/andrewfraley/magic_mapper
+- `magic_mapper.py`, `BUTTONS`, tasti codice evdev Linux **2..11 = 1..0**; supporta anche IR.
+- `magic_mapper.py`, `handle_event()`: acquisisce l'app in primo piano con `luna://com.webos.applicationManager/getForegroundAppInfo`; filtra azioni in base a `appId`; se nessuna corrisponde, in exclusive mode **rimanda il normale evento all'OS**. Gli eventi mappati non vengono inoltrati alla UI di webOS; l'azione specificata viene eseguita sul rilascio del tasto.
+- `README.md`, sezioni **Configuring buttons** e **IR input**: confermano regole `appId`, default pass-through e `exclusive_mode` necessario a impedire l'azione nativa sul DTT.
+- Questo dimostra **il prerequisito del controllo per applicazione**, ma non ancora un collegamento con la nostra IPTV, né l'effettiva compatibilità con il telecomando/firmware LG dell'utente.
+- `afonsojramos/magic-mapper-webos` è un'interfaccia che avvia una versione di Magic Mapper e fornisce gestione e ripristino; richiede comunque rooted TV.
+- `Simon34545/lginputhook` offre analoga intercettazione root con possibile rimappatura; per questo scenario Magic Mapper ha documentazione più esplicita sulle condizioni di app foreground.
+
+### Architettura proposta (DA IMPLEMENTARE E VERIFICARE)
+
+1. Preparare un fork dell'app `lennylxx/webos-iptv-player` con ID distinto, mantenendo il playback video e XMLTV. Correggere focus, scrolling e LCN da `channelNumber`; supportare comando interno `tuneLcn(N)` senza basarsi su indice.
+2. Riutilizzare/estendere il servizio Node.js incluso in `bundled-service/src/lan/server.ts` e `docs/lan-service.md`: questo ha già un server HTTP e la sottoscrizione Luna `serviceEvents` in foreground. Creare **un endpoint riservato al loopback**, limitato a cifre 0..9, con controllo del mittente ed autenticazione locale, e inviare `digit` alla UI tramite eventi del servizio. Non esporre la rotta all'intera LAN.
+3. Su televisore rootato e solo dopo verifica di compatibilità, configurare un input mapper come Magic Mapper che riconosca `appId` del nostro fork IPTV. **Solo durante la sua visualizzazione**: non inoltra il comando numerico al DTT, ma invia la cifra al servizio loopback. Per tutte le altre app: nessuna azione personalizzata e **passaggio trasparente all'OS**. Predisporre restituzione automatica comportamento stock e un interruttore OFF in caso di problemi.
+4. Il lettore accumula fino a 3-4 cifre (LCN massimo: 802), mostra un OSD di anteprima e risolve il numero per `tvg-chno`. Buca 72 -> «canale non presente in playlist», non seleziona una riga arbitraria.
+5. Test di sicurezza: rilascio del grab sugli input in crash/stop, TV DTT normale quando IPTV chiusa, nessuna interferenza con Power/Back/OK/volume, pressione lunga non alterata, no binding rete visibile ad altri dispositivi, falsificazione comandi bloccata.
+
+### Avvertenze e sequenza dei controlli
+
+- Questa architettura **non è una funzione già pronta**, quindi non dichiarare che qualsiasi launcher modificato offre subito il tastierino desiderato.
+- Le chiamate `curl` per ogni cifra possono aumentare la latenza; preferire un bridge localhost persistente e verificare ordine e tempi quando l'utente digita due o tre cifre rapidamente.
+- Leggere il modello preciso, OTAID e firmware via strumenti di sola consultazione e verificare https://cani.rootmy.tv. Il firmware 04.60.91 senza modello non basta.
+- Se il root non è compatibile o i rischi non sono accettati, fallback **tastierino a schermo D-pad**, che funziona senza accesso privilegiato.
+- Non serve Hearth per implementare questo schema. Hearth può soltanto offrire la Home personalizzata, separata dalla questione dei tasti.
