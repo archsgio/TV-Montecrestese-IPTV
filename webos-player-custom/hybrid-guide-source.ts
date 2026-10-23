@@ -174,8 +174,13 @@ export class HybridGuide {
           i === this.position, () => { this.position = i; this.option = 0; this.screen = 'actions'; this.render(); });
       }
       const selected = wrap.children[this.position] as HTMLElement | undefined;
-      if (selected && typeof selected.scrollIntoView === 'function') {
-        selected.scrollIntoView({ block: 'center' });
+      if (selected) {
+        // Scoped list scrolling: never reposition the entire application.
+        const viewport = this.dialog!.querySelector<HTMLElement>('.hybrid-content')!;
+        const row = selected.getBoundingClientRect();
+        const rect = viewport.getBoundingClientRect();
+        viewport.scrollTop = Math.max(0, viewport.scrollTop +
+          row.top - rect.top - (rect.height - row.height) / 2);
       }
     } else if (this.screen === 'actions') {
       const summary = document.createElement('div');
