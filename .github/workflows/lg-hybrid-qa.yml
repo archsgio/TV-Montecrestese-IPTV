@@ -22,6 +22,17 @@ jobs:
           node-version: '22'
       - name: Check ESM syntax (no TV connection)
         run: node --check tools/lg-hybrid/lg-dtt.mjs
+      - name: Check optional LAN companion syntax
+        run: node --check tools/lg-hybrid/bridge-server.mjs
+      - name: Check fixed local bridge actions and pairing protection
+        run: |
+          node --input-type=module -e "
+            import fs from 'node:fs';
+            const code=fs.readFileSync('tools/lg-hybrid/bridge-server.mjs','utf8');
+            for(const s of ['timingSafeEqual', 'privateIP', 'allowedOrigin', 'x-montecrestese-key', 'ssap://tv/getChannelList', 'ssap://tv/openChannel', 'ssap://system.launcher/open', 'official-fallbacks.json']) if(!code.includes(s)) process.exit(1);
+            if(code.includes('eval(')||code.includes('exec(')) process.exit(1);
+            console.log('OK: local-only, pairing, fixed destinations, no shell execution.');
+          "
       - name: Check official registry and local-only safety invariants
         run: |
           node --input-type=module -e "
