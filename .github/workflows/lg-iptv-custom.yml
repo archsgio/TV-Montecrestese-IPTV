@@ -29,6 +29,10 @@ jobs:
         run: node webos-player-custom/apply-patches.mjs upstream-player --dry-run
       - name: Applica modifiche in copia separata
         run: node webos-player-custom/apply-patches.mjs upstream-player
+      - name: Verifica il catalogo ibrido senza modificare upstream
+        run: node webos-player-custom/apply-hybrid.mjs upstream-player --dry-run
+      - name: Integra selezione IPTV / antenna / dirette ufficiali
+        run: node webos-player-custom/apply-hybrid.mjs upstream-player
       - name: Installa dipendenze e CLI LG
         run: |
           cd upstream-player
