@@ -34,6 +34,7 @@ export class HybridGuide {
   private screen: Screen = 'catalog';
   private position = 0;
   private option = 0;
+  private settingsField = 0;
   private message = '';
   private config: BridgeConfig | null = savedConfig();
   private tuner = new Map<number, string>();
@@ -88,7 +89,7 @@ export class HybridGuide {
     // A TV's virtual keyboard must retain text input when configuring its bridge.
     const target = e.target as HTMLElement | null;
     if (this.screen === 'settings' && target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
-      if (code !== 461 && code !== 405 && code !== 27) return;
+      if (![461, 405, 27, 38, 40, 13].includes(code)) return;
       (target as HTMLInputElement).blur();
     }
     if (!WATCH_KEYS.includes(code) && !(code >= 48 && code <= 57)) return;
@@ -101,7 +102,16 @@ export class HybridGuide {
     }
     if (this.pending) return;
     if (this.screen === 'settings') {
-      if (code === 13) this.saveSettings();
+      if (code === 38 || code === 40) {
+        this.settingsField = Math.max(0, Math.min(3, this.settingsField + (code === 38 ? -1 : 1)));
+        this.focusSettings();
+      } else if (code === 13) {
+        if (this.settingsField < 2) {
+          this.settingsField++;
+          this.focusSettings();
+        } else if (this.settingsField === 2) this.saveSettings();
+        else { this.screen = 'actions'; this.render(); }
+      }
       return;
     }
     if (this.screen === 'catalog') {
@@ -121,6 +131,15 @@ export class HybridGuide {
       } else if (code === 13) this.selectOption(this.option);
     }
   };
+
+  private focusSettings(): void {
+    if (!this.dialog) return;
+    const controls = this.dialog.querySelectorAll<HTMLElement>('.hybrid-form input, .hybrid-form button');
+    for (let i = 0; i < controls.length; i++) {
+      controls[i].classList.toggle('hybrid-row--focus', i === this.settingsField);
+    }
+    controls[this.settingsField]?.focus();
+  }
 
   private clearContent(): HTMLElement {
     const root = this.dialog!.querySelector<HTMLElement>('.hybrid-content')!;
@@ -206,6 +225,7 @@ export class HybridGuide {
       root.appendChild(form);
     }
     this.dialog.querySelector<HTMLElement>('.hybrid-status')!.textContent = this.message;
+    if (this.screen === 'settings') this.focusSettings();
   }
 
   private selectOption(index: number): void {
@@ -213,14 +233,14 @@ export class HybridGuide {
     const item = this.options[index];
     if (!item) return;
     const entry = HYBRID_CATALOG[this.position];
-    if (item.action === 'settings') { this.screen = 'settings'; this.message = ''; this.render(); return; }
+    if (item.action === 'settings') { this.screen = 'settings'; this.settingsField = 0; this.message = ''; this.render(); return; }
     if (item.action === 'iptv') {
       if (this.tuneIPTV(entry.lcn)) this.close();
       else { this.message = 'Il canale non è nella playlist IPTV attiva.'; this.render(); }
       return;
     }
     if (!this.config) {
-      this.screen = 'settings'; this.message = 'Per il cambio automatico serve il servizio locale sul PC.'; this.render();
+      this.screen = 'settings'; this.settingsField = 0; this.message = 'Per il cambio automatico serve il servizio locale sul PC.'; this.render();
       return;
     }
     this.sendCommand(item.action, entry);
@@ -232,7 +252,7 @@ export class HybridGuide {
     const config = { endpoint, token };
     if (!validateBridgeConfig(config)) {
       this.message = 'Usa IP privato, porta 1024-65535 e chiave esadecimale a 64 caratteri.';
-      this.render();
+      this.dialog?.querySelector<HTMLElement>('.hybrid-status')!.textContent = this.message;
       return;
     }
     this.config = config;
