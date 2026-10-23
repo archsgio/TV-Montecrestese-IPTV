@@ -12,8 +12,8 @@ LCN;Canale;Presenza URL v10;Evidenza disponibile;Stato v10;EPG XMLTV;Nota
 11;Telecupole;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;NO;URL v7 mantenuto, da verificare su TV
 12;Videogruppo;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
 13;Rete 7 Piemonte;SI;VIDEO_AUDIO_CONFERMATI;INCLUSO;NO;URL v7 invariato
-14;Primantenna;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;NO;URL archiviato in v7; riprovare solo sorgente realmente diversa
-15;GRP TV;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;NO;URL archiviato in v7; riprovare solo sorgente realmente diversa
+14;Primantenna;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;NO;URL archiviato in v7 -  riprovare solo sorgente realmente diversa
+15;GRP TV;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;NO;URL archiviato in v7 -  riprovare solo sorgente realmente diversa
 16;Sesta Rete;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
 17;VCO Azzurra TV;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;NO;URL v7 mantenuto, da verificare su TV
 18;Canale Italia;SI;VIDEO_AUDIO_CONFERMATI;INCLUSO;NO;URL v7 invariato
@@ -39,10 +39,10 @@ LCN;Canale;Presenza URL v10;Evidenza disponibile;Stato v10;EPG XMLTV;Nota
 38;Giallo;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
 39;Top Crime;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
 40;Boing;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
-41;K2;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;SI;URL archiviato in v7; riprovare solo sorgente realmente diversa
+41;K2;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;SI;URL archiviato in v7 -  riprovare solo sorgente realmente diversa
 42;Rai Gulp;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
 43;Rai Yoyo;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
-44;Frisbee;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;SI;URL archiviato in v7; riprovare solo sorgente realmente diversa
+44;Frisbee;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;SI;URL archiviato in v7 -  riprovare solo sorgente realmente diversa
 45;Boing Plus;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
 46;Cartoonito;SI;VIDEO_AUDIO_CONFERMATI;INCLUSO;SI;URL v7 invariato
 47;Super!;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
@@ -55,9 +55,9 @@ LCN;Canale;Presenza URL v10;Evidenza disponibile;Stato v10;EPG XMLTV;Nota
 54;Rai Storia;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
 55;Mediaset Extra;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;NO;URL v7 mantenuto, da verificare su TV
 56;HGTV;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
-57;Italiana;NO;NON_APPLICABILE;SENZA_URL;NO;Italiana powered by Rai attiva dal 01/10/2026 sul LCN57; diretta ufficiale https://www.raiplay.it/dirette/italiana; M3U stabile non ancora verificato; non rinominato senza conferma
+57;Italiana;NO;NON_APPLICABILE;SENZA_URL;NO;Italiana powered by Rai dal 01/10/2026 su LCN57. Diretta ufficiale: https://www.raiplay.it/dirette/italiana. Nessuna M3U verificata. -  diretta ufficiale https://www.raiplay.it/dirette/italiana -  M3U stabile non ancora verificato -  non rinominato senza conferma
 58;Rai Sport;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
-59;Discovery Turbo;SI;HLS_MASTER_E_MEDIA_RAGGIUNGIBILI_LG_DA_PROVARE;CANDIDATO_DA_COLLAUDARE;NO;Sorgente Discovery Turbo da iptv-org / Free-TV; master e media playlist HLS verificati, non il video sulla LG
+59;Discovery Turbo;SI;HLS_MASTER_E_MEDIA_RAGGIUNGIBILI_LG_DA_PROVARE;CANDIDATO_DA_COLLAUDARE;NO;Sorgente Discovery Turbo da iptv-org / Free-TV -  master e media playlist HLS verificati, non il video sulla LG
 60;Sportitalia;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
 61;Club TV;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
 62;Donna Sport TV;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
@@ -72,15 +72,15 @@ LCN;Canale;Presenza URL v10;Evidenza disponibile;Stato v10;EPG XMLTV;Nota
 71;Canale Italia Piemonte;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
 72;Telelombardia;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
 73;Radio Bruno TV;SI;VIDEO_AUDIO_CONFERMATI;INCLUSO;NO;URL v7 invariato
-75;Top Calcio 24;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;SI;URL archiviato in v7; riprovare solo sorgente realmente diversa
+75;Top Calcio 24;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;SI;URL archiviato in v7 -  riprovare solo sorgente realmente diversa
 76;Valenza TV;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
 78;Motori TV;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;NO;URL v7 mantenuto, da verificare su TV
 80;Onda Novara TV;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;NO;URL v7 mantenuto, da verificare su TV
 82;Giocabet;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
-83;Piemonte+;SI;SIMULCAST_LCN13_CONFERMATO_DA_FONTE_ESTERNA;CANDIDATO_SIMULCAST;NO;Stessa sorgente Rete7 LCN13 gia funzionante; Piemonte+ generalmente in simulcast, programmazioni occasionalmente differenti
+83;Piemonte+;SI;SIMULCAST_LCN13_CONFERMATO_DA_FONTE_ESTERNA;CANDIDATO_SIMULCAST;NO;Stessa sorgente Rete7 LCN13 gia funzionante -  Piemonte+ generalmente in simulcast, programmazioni occasionalmente differenti
 84;Telereporter;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
 87;RBE-TV;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
 96;Radio Birikina TV;SI;VIDEO_AUDIO_CONFERMATI;INCLUSO;NO;URL v7 invariato
 98;Radio 4 You TV;NO;NON_APPLICABILE;SENZA_URL;NO;RIMOSSO DAL MUX LCN98 23/09/2026: storico, non presumere canale attivo
 101;Rai 4K;NO;NON_APPLICABILE;SENZA_URL;NO;Ricerca sorgente autentica ancora aperta
-802;Rai 3 TGR Piemonte;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;SI;URL archiviato in v7; riprovare solo sorgente realmente diversa
+802;Rai 3 TGR Piemonte;SI;NON_FUNZIONA;ESCLUSO_NON_FUNZIONANTE;SI;URL archiviato in v7 -  riprovare solo sorgente realmente diversa
