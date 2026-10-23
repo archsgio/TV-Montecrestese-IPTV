@@ -76,3 +76,43 @@ for (let i = 0; i < catalog.length; i++) {
   assert(status === (!exists ? 'SENZA_URL' : bad.has(catalog[i]) ? 'ESCLUSO_NON_FUNZIONANTE' : 'INCLUSO'), 'catalog status ' + c);
 }
 console.log('OK: 85 LCN, v7 archive 64, v9 clean 58, 6 LG failures excluded, 21 URL missing, 45 EPG IDs, 11 known-good preserved, no LCN duplicates or stream changes.');
+
+// v10: add only two documented candidates; no mutation of the 58 v9 streams.
+const v10Epg = parseM3u(read('TV_Montecrestese_LCN_v10_CANDIDATI_XMLTV_TEST.m3u'), 'v10 EPG');
+const v10NoEpg = parseM3u(read('TV_Montecrestese_LCN_v10_CANDIDATI_FLUSSI_TEST.m3u'), 'v10 plain');
+const v10ByLcn = new Map(v10Epg.entries.map(x => [x.lcn, x]));
+const v9ByLcn = new Map(cleanEpg.entries.map(x => [x.lcn, x]));
+const latestStatus = read('Catalogo_LCN_Montecrestese_v10_STATO.csv').trim()
+  .split(/\r?\n/).slice(1).map(x => x.split(';'));
+assert(v10Epg.entries.length === 60 && v10NoEpg.entries.length === 60, 'v10 60 entries');
+assert(v10Epg.entries.filter(x => x.tvgId).length === 45, 'v10 45 EPG IDs unchanged');
+assert(v10Epg.header === cleanEpg.header && v10NoEpg.header === cleanNoEpg.header, 'v10 playlist header');
+assert(latestStatus.length === 85, 'v10 catalog must preserve 85 positions');
+assert(catalog.filter(x => !v10ByLcn.has(x)).length === 19, 'v10 must leave 19 entries without stream');
+for (const original of cleanEpg.entries) {
+  const updated = v10ByLcn.get(original.lcn);
+  assert(!!updated && original.meta === updated.meta && original.url === updated.url,
+    'v10 changed or removed working stream ' + original.lcn);
+}
+for (let i = 0; i < v10Epg.entries.length; i++) {
+  const e = v10Epg.entries[i], p = v10NoEpg.entries[i];
+  assert(e.lcn === p.lcn && e.url === p.url, 'v10 EPG/plain mismatch');
+  assert(!bad.has(e.lcn), 'v10 resurrected LG-broken LCN ' + e.lcn);
+}
+const expectedAdds = [59, 83];
+assert(v10Epg.entries.filter(x => !v9ByLcn.has(x.lcn)).map(x => x.lcn).join(',')
+  === expectedAdds.join(','), 'v10 introduced wrong channels');
+const discovery = v10ByLcn.get(59), piemonte = v10ByLcn.get(83);
+assert(discovery && discovery.url.includes('/IT_SIMULCAST/TURBO/CMAF/index.m3u8'),
+  'Discovery Turbo must match the externally checked master');
+assert(piemonte?.url === v10ByLcn.get(13)?.url,
+  'Piemonte+ alias must use known-working Rete 7 HLS');
+for (const [lcn, state] of [[59, 'CANDIDATO_DA_COLLAUDARE'], [83, 'CANDIDATO_SIMULCAST']]) {
+  assert(latestStatus.some(row => Number(row[0]) === lcn && row[4] === state),
+    'v10 status missing candidate ' + lcn);
+}
+for (let i = 0; i < latestStatus.length; i++) {
+  assert(Number(latestStatus[i][0]) === catalog[i], 'v10 catalog order mismatch');
+}
+console.log('OK v10: 60 candidates, +59 Discovery Turbo / +83 Piemonte+ simulcast, 19 without streams; all 58 v9 URLs preserved, LCN and EPG synchronized.');
+
