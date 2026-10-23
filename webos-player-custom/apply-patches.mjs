@@ -32,15 +32,12 @@ for (const [name, edits] of Object.entries(manifest.operations)) {
     }
     if (edit.find === edit.replace) throw new Error('No-op find/replace: ' + name);
     const hits = content.split(edit.find).length - 1;
-    if (hits === edit.expected) {
+    // Some replacements intentionally retain their anchor (e.g. an import
+    // followed by an extra import). Recognize the completed edit FIRST.
+    if (content.includes(edit.replace)) {
+      stats.already++;
+    } else if (hits === edit.expected) {
       content = content.split(edit.find).join(edit.replace);
-    } else if (hits === 0 && content.includes(edit.replace)) {
-      stats.already++;
-    } else if (content.includes(edit.replace) && hits > 0
-        && edit.replace.includes(edit.find)
-        && hits === edit.expected) {
-      // A replacement retaining its anchor must never be duplicated on reapply.
-      stats.already++;
     } else {
       throw new Error('Upstream changed: ' + name + ', expected ' + edit.expected
         + ' occurrences of anchor; found ' + hits);
