@@ -48,6 +48,11 @@
         "find": "    return { top: rect.top, bottom };",
         "replace": "    // Keep the focused row away from clipped viewport edges (including the footer).\n    return { top: rect.top + 8, bottom: bottom - 20 };",
         "expected": 1
+      },
+      {
+        "find": "if (renderedTarget && this.scrollFrame === null) {\n      this.nav.focus(renderedTarget);",
+        "replace": "if (renderedTarget && this.scrollFrame === null\n        && this.rowVisibility(renderedTarget, 'channel') === 'full') {\n      this.nav.focus(renderedTarget);",
+        "expected": 1
       }
     ],
     "src/components/sidebar.ts": [
@@ -168,6 +173,11 @@
       {
         "find": "    if (action === 'yellow' && currentView === 'player') {\n      this.player.showOSD();\n      return;\n    }",
         "replace": "    if (action === 'yellow' && currentView === 'player') {\n      // Yellow opens the accessible LCN keypad while watching live channels.\n      // On VOD the original OSD behavior is preserved.\n      if (this.player.isVod()) this.player.showOSD();\n      else {\n        this.sidebar.hide();\n        this.menu.hide();\n        this.numericPad.open();\n      }\n      return;\n    }",
+        "expected": 1
+      },
+      {
+        "find": "      if (document.hidden) {\n        this.parentalPinPrompt.dismiss();",
+        "replace": "      if (document.hidden) {\n        this.numericPad.close();\n        this.parentalPinPrompt.dismiss();",
         "expected": 1
       }
     ],
