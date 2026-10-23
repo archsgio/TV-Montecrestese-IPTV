@@ -1,5 +1,27 @@
 # TV Montecrestese IPTV — catalogo LCN Piemonte/VCO
 
+## Nuova v9 — elenco operativo di prova (23/10/2026)
+
+**Solo in questo ramo sperimentale; la v7 di riferimento su `main` resta invariata.** La v9 conserva gli URL dei **58** canali non bocciati sul televisore e omette i **6** già confermati non funzionanti (14, 15, 41, 44, 75, 802). Non è la lista completa: **21 LCN** restano ancora senza URL verificato.
+
+- [v9 pulita con EPG](TV_Montecrestese_LCN_v9_PULITA_XMLTV_TEST.m3u) — 58 canali, 45 identificativi XMLTV.
+- [v9 pulita senza EPG](TV_Montecrestese_LCN_v9_PULITA_FLUSSI_TEST.m3u) — stessi 58 URL.
+- [Catalogo completo aggiornato: 85 LCN e risultati reali](Catalogo_LCN_Montecrestese_v9_STATO.csv).
+- [Rapporto di ricerca e motivazioni delle esclusioni](REPORT_V9_OTTIMIZZAZIONE_LCN_2026-10-23.md).
+- [Validatore statico e regressioni](scripts/audit-playlist-montecrestese.mjs).
+
+Le URL dirette per configurare il lettore domani (attivare una sola playlist per volta):
+
+```
+https://raw.githubusercontent.com/archsgio/TV-Montecrestese-IPTV/feature/webos-iptv-lcn-focus/TV_Montecrestese_LCN_v9_PULITA_XMLTV_TEST.m3u
+https://raw.githubusercontent.com/archsgio/TV-Montecrestese-IPTV/feature/webos-iptv-lcn-focus/TV_Montecrestese_LCN_v9_PULITA_FLUSSI_TEST.m3u
+```
+
+**Non è ancora stato fatto il collaudo sulla LG della v9.** La mancanza di un canale dall'IPTV non implica la sua assenza dal digitale terrestre.
+
+---
+
+
 > **Esito collaudo v8 (23/10/2026): nessuna delle tre modifiche (15 GRP TV, 41 K2, 802 Rai 3 TGR Piemonte) ha funzionato sulla LG. La v8 è bocciata; usare la v7 come riferimento.** Dettagli: [Collaudo v8 negativo](COLLAUDO_LG_V8_ESITO_NEGATIVO_2026-10-23.md).
 
 
