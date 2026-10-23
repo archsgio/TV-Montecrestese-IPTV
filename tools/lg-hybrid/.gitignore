@@ -1,0 +1,5 @@
+.local-bridge-secret
+.local-bridge-secret.*
+node_modules/
+*.cert
+*.mac
