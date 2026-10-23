@@ -1,0 +1,54 @@
+name: LG IPTV Montecrestese - build controllata
+
+on:
+  push:
+    branches:
+      - feature/webos-iptv-lcn-focus
+    paths:
+      - '.github/workflows/lg-iptv-custom.yml'
+      - 'webos-player-custom/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-and-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout patch versionata
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Scarica upstream v1.17.0
+        run: git clone --depth 1 --branch v1.17.0 https://github.com/lennylxx/webos-iptv-player.git upstream-player
+      - name: Verifica patch senza scrivere
+        run: node webos-player-custom/apply-patches.mjs upstream-player --dry-run
+      - name: Applica modifiche in copia separata
+        run: node webos-player-custom/apply-patches.mjs upstream-player
+      - name: Installa dipendenze e CLI LG
+        run: |
+          cd upstream-player
+          npm ci
+          npm install --global @webos-tools/cli
+      - name: Test unitari inclusi quelli LCN
+        working-directory: upstream-player
+        run: npm test
+      - name: Costruisci IPK con lint e test di compatibilita
+        working-directory: upstream-player
+        run: npm run package
+      - name: Verifica metadati e ID separati
+        working-directory: upstream-player
+        run: |
+          node -e "const fs=require('fs');const app=JSON.parse(fs.readFileSync('appinfo.json'));const srv=JSON.parse(fs.readFileSync('bundled-service/src/services.json'));if(app.id!=='com.archsgio.iptv'||srv.id!=='com.archsgio.iptv.service')process.exit(1);console.log('Verified isolated app and service IDs')"
+          find . -maxdepth 1 -name 'com.archsgio.iptv_*.ipk' -size +100k -print | grep -q .
+      - name: Conserva IPK per collaudo (scadenza 2 giorni)
+        uses: actions/upload-artifact@v4
+        with:
+          name: IPTV-Montecrestese-custom-IPK
+          path: upstream-player/com.archsgio.iptv_*.ipk
+          if-no-files-found: error
+          retention-days: 2
