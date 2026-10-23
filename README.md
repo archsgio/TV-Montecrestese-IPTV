@@ -1,5 +1,8 @@
 # TV Montecrestese IPTV — catalogo LCN Piemonte/VCO
 
+> **Esito collaudo v8 (23/10/2026): nessuna delle tre modifiche (15 GRP TV, 41 K2, 802 Rai 3 TGR Piemonte) ha funzionato sulla LG. La v8 è bocciata; usare la v7 come riferimento.** Dettagli: [Collaudo v8 negativo](COLLAUDO_LG_V8_ESITO_NEGATIVO_2026-10-23.md).
+
+
 **Ultimo aggiornamento: 23 ottobre 2026 • Playlist v7 di prova.**
 
 La playlist è personalizzata per la numerazione dei canali digitali terrestri approvata dall'utente. Le sorgenti IPTV sono riferimenti esterni, **non sono distribuiti video, file di accesso, token personali né password**.
