@@ -1,5 +1,17 @@
 # TV Montecrestese IPTV — catalogo LCN Piemonte/VCO
 
+## Integrazione Hybrid nell'app — 24 ottobre 2026
+
+Il ramo sperimentale ora include la **guida interna di tutte le 85 posizioni LCN**, un selettore **IPTV / DVB-T2 nativo / sito ufficiale** e un bridge opzionale da PC Windows. Durante un canale IPTV Live: **GIALLO → VAI senza cifre** apre il catalogo; **GIALLO → digita LCN → VAI** apre la scelta delle sorgenti per i canali mancanti o i sei flussi già bocciati. Tutti gli 85 numeri sono navigabili con ↑ ↓ e OK.
+
+**Non installare questa nuova build come versione definitiva finché GitHub Actions non è verde e il collaudo sul TV non conferma la compatibilità.** La playlist v10 rimane 60 candidati IPTV: la guida 85 LCN non aggiunge segnaposto. Il passaggio DVB richiede un canale memorizzato nell'antenna e il servizio su PC; i siti ufficiali possono non riprodurre video nel browser LG.
+
+- [Rapporto completo, limiti e checklist](REPORT_HYBRID_85_LCN_2026-10-24.md)
+- [Procedura bridge locale e controlli di sicurezza](tools/lg-hybrid/README.md)
+- [Build GitHub Actions del player custom](.github/workflows/lg-iptv-custom.yml)
+
+---
+
 ## Ricerca alternativa: LG Hybrid senza root (24/10/2026)
 
 **La copertura IPTV pura resta 60 canali candidati su 85 LCN richiesti**, con 19 LCN senza URL e 6 URL già respinti nella v7. Da oggi esiste una seconda strada, **solo in preparazione, non collaudata sulla LG**:
