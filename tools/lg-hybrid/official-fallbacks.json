@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "updated": "2026-10-24",
+  "description": "Official broadcaster browser fallbacks; not direct IPTV M3U8 URLs. Only open links with user command or click; never auto-scrape or proxy.",
+  "entries": [
+    {
+      "lcn": 8,
+      "name": "TV8",
+      "url": "https://www.tv8.it/streaming",
+      "kind": "official_live",
+      "note": "Player del broadcaster; accesso tramite browser TV non collaudato"
+    },
+    {
+      "lcn": 12,
+      "name": "Videogruppo",
+      "url": "https://www.mediapason.it/videogruppo/",
+      "kind": "official_info",
+      "note": "Pagina del gruppo e conferma LCN 12; non è una diretta verificata"
+    },
+    {
+      "lcn": 14,
+      "name": "Primantenna",
+      "url": "https://www.primantenna.tv/diretta-tv/",
+      "kind": "official_live_page",
+      "note": "Pagina ufficiale della diretta, video webOS non verificato"
+    },
+    {
+      "lcn": 15,
+      "name": "GRP TV",
+      "url": "https://grp.it/diretta-tv",
+      "kind": "official_live_page",
+      "note": "Pagina ufficiale con player incorporato multistream; non funziona come HLS nella v8"
+    },
+    {
+      "lcn": 16,
+      "name": "Sesta Rete",
+      "url": "https://sestarete.tv.it/streaming/",
+      "kind": "official_stream_page",
+      "note": "Pagina streaming ufficiale; iframe xdevel, da accertare se contiene effettivo video"
+    },
+    {
+      "lcn": 26,
+      "name": "Cielo",
+      "url": "https://www.cielotv.it/streaming",
+      "kind": "official_live",
+      "note": "Pagina ufficiale; il sito ha mostrato errore 320 al controllo esterno"
+    },
+    {
+      "lcn": 29,
+      "name": "LA7 Cinema",
+      "url": "https://www.la7.it/la7cinema",
+      "kind": "official_live_page",
+      "note": "Pagina ufficiale; usare browser, nessuna estrazione automatica e nessun aggiramento DRM"
+    },
+    {
+      "lcn": 50,
+      "name": "Sky TG24",
+      "url": "https://tg24.sky.it/diretta",
+      "kind": "official_live",
+      "note": "Diretta gratuita dichiarata 24/7 sul sito dell'emittente"
+    },
+    {
+      "lcn": 57,
+      "name": "Italiana",
+      "url": "https://www.raiplay.it/dirette/italiana",
+      "kind": "official_live",
+      "note": "Rai ufficiale dal 01/10/2026; nessun M3U stabile verificato"
+    },
+    {
+      "lcn": 63,
+      "name": "Il Sole 24 Ore TV",
+      "url": "https://www.ilsole24ore.tv/",
+      "kind": "official_info",
+      "note": "Landing ufficiale, non scambiare con Radio24TV sul LCN 246"
+    },
+    {
+      "lcn": 72,
+      "name": "Telelombardia",
+      "url": "https://telelombardia.video/video/index",
+      "kind": "official_live_directory",
+      "note": "Directory ufficiale con selezione Live Telelombardia; player in browser non collaudato"
+    },
+    {
+      "lcn": 75,
+      "name": "Top Calcio 24",
+      "url": "https://telelombardia.video/video/index",
+      "kind": "official_live_directory",
+      "note": "Directory ufficiale con selezione Live Top Calcio 24; HLS v7 non funziona su LG"
+    },
+    {
+      "lcn": 87,
+      "name": "RBE-TV",
+      "url": "https://rbe.it/ascolta-rbe/",
+      "kind": "official_stream_page",
+      "note": "Portale ufficiale Diretta TV / Diretta radio; verifica della componente video ancora necessaria"
+    }
+  ]
+}
