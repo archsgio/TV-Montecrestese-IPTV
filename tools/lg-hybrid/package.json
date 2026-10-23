@@ -1,0 +1,13 @@
+{
+  "name": "tv-montecrestese-lg-hybrid-probe",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local LG webOS SSAP DVB-T channel inventory and optional tune; no root, no IPTV proxy",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "lgtv2": "2.1.0"
+  }
+}
