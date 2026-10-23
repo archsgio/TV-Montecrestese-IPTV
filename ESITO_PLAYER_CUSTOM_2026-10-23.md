@@ -22,6 +22,11 @@ https://github.com/archsgio/TV-Montecrestese-IPTV/actions/runs/40024638137
 4. Tastierino virtuale azionato dal tasto **GIALLO** durante il video live, frecce/OK/Indietro, messaggio per LCN assente; resta il normale OSD giallo durante contenuti VOD.
 5. Il video e le playlist restano quelli dell'upstream: non vengono aggiunte origini video nuove o modificati stream della v7.
 
+## Revisione tecnica dopo identificazione del televisore (23 ottobre 2026)
+Il TV è stato identificato dall'utente come **LG 24TQ510S-WZ**, webOS 22. Il firmware indicato è 04.60.91: la versione installata va riconfermata sul TV. La risoluzione fisica di 1366×768 non corrisponde alle coordinate CSS del pacchetto, che usa **1920×1080** espliciti in `appinfo.json`, `index.html` e `css/main.css` (in accordo con le risoluzioni grafiche supportate da LG).
+
+Dopo l'IPK della build n. 3 è stata avviata una revisione **solo del branch** per testare i viewport 1080/720 e impedire che i tasti colorati, canale e media raggiungano l'app sottostante quando il tastierino virtuale è aperto. **Non sostituire automaticamente l'IPK precedente**: verificare prima l'esito GitHub Actions del nuovo commit. Nessun test reale sulla TV ancora svolto.
+
 ## Prove finali ancora necessarie
 
 - Installare **solo la build custom** come nuova app, senza eliminare l'originale, e caricare v7 XMLTV con offset EPG 0.
