@@ -1,0 +1,157 @@
+{
+  "source_repository": "lennylxx/webos-iptv-player",
+  "source_branch": "main",
+  "notes": "Apply once to upstream checkout; exact anchor checks prevent silent corruption.",
+  "operations": {
+    "src/components/channel-list.ts": [
+      {
+        "find": "import { PlaylistService } from '../services/playlist-service';",
+        "replace": "import { PlaylistService } from '../services/playlist-service';\nimport { channelLcn, findChannelIndexByLcn } from '../utils/channel-lcn';",
+        "expected": 1
+      },
+      {
+        "find": "        const num = event.number - 1;\n        if (num >= 0 && num < PlaylistService.channels.length) {\n          this.markPlaying(num);\n          this.revealChannel(num); // may widen currentGroup — read scope after\n          this.onChannelSelect(num, undefined, this.currentScope(), 'fullscreen');\n        }",
+        "replace": "        const index = findChannelIndexByLcn(PlaylistService.channels, event.number);\n        if (index >= 0) {\n          this.markPlaying(index);\n          this.revealChannel(index); // may widen currentGroup — read scope after\n          this.onChannelSelect(index, undefined, this.currentScope(), 'fullscreen');\n        }",
+        "expected": 1
+      },
+      {
+        "find": "${globalIdx + 1}</div>",
+        "replace": "${channelLcn(ch, globalIdx)}</div>",
+        "expected": 1
+      },
+      {
+        "find": "const viewportHeight = previousMain?.clientHeight || CHANNEL_VIEWPORT_FALLBACK;",
+        "replace": "const viewportHeight = this.safeChannelViewportHeight(previousMain);",
+        "expected": 1
+      },
+      {
+        "find": "this.channelVirtualizer.centerOn(position, main?.clientHeight || CHANNEL_VIEWPORT_FALLBACK);",
+        "replace": "this.channelVirtualizer.centerOn(position, this.safeChannelViewportHeight(main));",
+        "expected": 1
+      },
+      {
+        "find": "virtualizer.ensureVisible(position, scroller?.clientHeight || CHANNEL_VIEWPORT_FALLBACK);",
+        "replace": "virtualizer.ensureVisible(position, list === 'channel'\n        ? this.safeChannelViewportHeight(scroller)\n        : scroller?.clientHeight || CHANNEL_VIEWPORT_FALLBACK);",
+        "expected": 1
+      },
+      {
+        "find": "this.channelVirtualizer.ensureVisible(next, main?.clientHeight || CHANNEL_VIEWPORT_FALLBACK);",
+        "replace": "this.channelVirtualizer.ensureVisible(next, this.safeChannelViewportHeight(main));",
+        "expected": 1
+      },
+      {
+        "find": "  private moveVirtualFocus(delta: number): boolean {",
+        "replace": "  // A row and its bright focus ring must remain entirely above any bottom hint bar.\n  // The native clientHeight is misleading when an absolutely-positioned footer overlaps it.\n  private safeChannelViewportHeight(main: HTMLElement | null): number {\n    if (!main) return CHANNEL_VIEWPORT_FALLBACK;\n    const visible = this.listViewport(main, 'channel');\n    return Math.max(CHANNEL_ROW_STRIDE, Math.floor(visible.bottom - visible.top));\n  }\n\n  private moveVirtualFocus(delta: number): boolean {",
+        "expected": 1
+      },
+      {
+        "find": "    return { top: rect.top, bottom };",
+        "replace": "    // Keep the focused row away from clipped viewport edges (including the footer).\n    return { top: rect.top + 8, bottom: bottom - 20 };",
+        "expected": 1
+      }
+    ],
+    "src/components/sidebar.ts": [
+      {
+        "find": "import { PlaylistService } from '../services/playlist-service';",
+        "replace": "import { PlaylistService } from '../services/playlist-service';\nimport { channelLcn } from '../utils/channel-lcn';",
+        "expected": 1
+      },
+      {
+        "find": "${globalIdx + 1}</span>",
+        "replace": "${channelLcn(ch, globalIdx)}</span>",
+        "expected": 1
+      }
+    ],
+    "src/components/player.ts": [
+      {
+        "find": "import { PlaylistService } from '../services/playlist-service';",
+        "replace": "import { PlaylistService } from '../services/playlist-service';\nimport { channelLcn, findChannelIndexByLcn } from '../utils/channel-lcn';",
+        "expected": 1
+      },
+      {
+        "find": "channelNumber: this.currentIndexAnchor + 1,",
+        "replace": "channelNumber: channel ? channelLcn(channel, this.currentIndexAnchor) : this.currentIndexAnchor + 1,",
+        "expected": 1
+      },
+      {
+        "find": "// Channel numbers are 1-based, matching the OSD readout (currentIndexAnchor + 1).",
+        "replace": "// Tune the broadcast LCN declared by tvg-chno, not the row position.",
+        "expected": 1
+      },
+      {
+        "find": "const index = number - 1;",
+        "replace": "const index = findChannelIndexByLcn(PlaylistService.channels, number);",
+        "expected": 1
+      },
+      {
+        "find": "if (index < 0 || index >= PlaylistService.channels.length) {",
+        "replace": "if (index < 0) {",
+        "expected": 1
+      }
+    ],
+    "src/navigation/key-handler.ts": [
+      {
+        "find": "// A number can never exceed the highest channel there is, so 350 channels cap\n// entry at three digits — and the buffer can no longer grow without bound.\nfunction maxNumberDigits(): number {\n  const count = channelCount?.() ?? 0;\n  if (count <= 0) return CONFIG.PLAYER.CHANNEL_NUMBER_MAX_DIGITS;\n  return String(count).length;\n}",
+        "replace": "// The LCN can exceed the playlist length (e.g. 802 with only 64 channels).\nfunction maxNumberDigits(): number {\n  const count = channelCount?.() ?? 0;\n  return Math.max(CONFIG.PLAYER.CHANNEL_NUMBER_MAX_DIGITS, String(count).length);\n}",
+        "expected": 1
+      }
+    ],
+    "appinfo.json": [
+      {
+        "find": "\"id\": \"com.lennylxx.iptv\"",
+        "replace": "\"id\": \"com.archsgio.iptv\"",
+        "expected": 1
+      },
+      {
+        "find": "\"vendor\": \"lennylxx\"",
+        "replace": "\"vendor\": \"archsgio\"",
+        "expected": 1
+      },
+      {
+        "find": "\"title\": \"webOS IPTV Player\"",
+        "replace": "\"title\": \"IPTV Montecrestese\"",
+        "expected": 1
+      }
+    ],
+    "bundled-service/src/services.json": [
+      {
+        "find": "com.lennylxx.iptv.service",
+        "replace": "com.archsgio.iptv.service",
+        "expected": 2
+      }
+    ],
+    "src/config.ts": [
+      {
+        "find": "APP_NAME: 'webOS IPTV Player'",
+        "replace": "APP_NAME: 'IPTV Montecrestese'",
+        "expected": 1
+      }
+    ],
+    "index.html": [
+      {
+        "find": "<title>webOS IPTV Player</title>",
+        "replace": "<title>IPTV Montecrestese</title>",
+        "expected": 1
+      }
+    ],
+    "css/channel-list.css": [
+      {
+        "append": "\n\n/* Montecrestese: leave enough real scroll range above the bottom action/hint bar.\n   Do not change .channel-item height without matching CHANNEL_ROW_STRIDE (88px). */\n.channel-main {\n  padding-bottom: 108px;\n}\n.has-channel-hints .channel-main,\n.editing .channel-main {\n  padding-bottom: 132px;\n}\n"
+      }
+    ],
+    "css/navigation.css": [
+      {
+        "append": "\n\n/* Montecrestese: high-contrast REMOTE focus, distinct from \"playing\"/\"active\".\n   Strong inner border avoids cropping when the list itself clips the overflow. */\n[data-focusable].focused,\n.group-item.focused,\n.channel-item.focused,\n.sidebar-ch-item.focused,\n.playlist-tab.focused {\n  border-color: #ffe16b !important;\n  box-shadow: inset 0 0 0 2px #ffe16b, 0 0 0 2px rgba(255,225,107,.75) !important;\n  color: #fff !important;\n}\n.group-item.focused,\n.channel-item.focused,\n.sidebar-ch-item.focused,\n.playlist-tab.focused {\n  background: #174766 !important;\n}\n.channel-item.focused .channel-number,\n.sidebar-ch-item.focused .ch-num {\n  color: #ffe16b !important;\n  font-weight: 700;\n}\n"
+      }
+    ],
+    "css/tab-bar.css": [
+      {
+        "append": "\n\n/* Montecrestese: the selected TAB is not necessarily the remote-focused TAB. */\n.tab-bar-item.focused {\n  color: #fff !important;\n  background: #174766 !important;\n  box-shadow: inset 0 0 0 3px #ffe16b !important;\n  border-bottom-color: #ffe16b !important;\n  border-radius: 8px;\n}\n.tab-bar-item.active:not(.focused) {\n  color: var(--accent);\n  border-bottom-color: var(--accent);\n}\n"
+      }
+    ]
+  },
+  "create": {
+    "src/utils/channel-lcn.ts": "import type { Channel } from '../types';\n\n// A valid broadcaster LCN overrides the index of the channel in the IPTV list.\nexport function channelLcn(channel: Pick<Channel, 'channelNumber'>, index: number): number {\n  const declared = channel.channelNumber;\n  return typeof declared === 'number' && Number.isInteger(declared) && declared > 0\n    ? declared : index + 1;\n}\n\n// Explicit LCN always wins, even when another unnumbered item uses that position.\nexport function findChannelIndexByLcn(channels: readonly Channel[], lcn: number): number {\n  if (!Number.isInteger(lcn) || lcn <= 0) return -1;\n  const declared = channels.findIndex(ch => ch.channelNumber === lcn);\n  if (declared >= 0) return declared;\n  return channels.findIndex((ch, index) =>\n    channelLcn(ch, index) === lcn &&\n    !(typeof ch.channelNumber === 'number' && Number.isInteger(ch.channelNumber) && ch.channelNumber > 0));\n}\n",
+    "src/utils/channel-lcn.test.ts": "import { describe, expect, it } from 'vitest';\nimport type { Channel } from '../types';\nimport { channelLcn, findChannelIndexByLcn } from './channel-lcn';\n\nconst entries = [7, 9, 13, 75, 802].map(n => ({ channelNumber: n } as Channel));\n\ndescribe('Montecrestese broadcast numbering', () => {\n  it('shows real LCNs instead of the 1-based playlist order', () => {\n    expect(entries.map(channelLcn)).toEqual([7, 9, 13, 75, 802]);\n  });\n  it('tunes sparse LCN 802 even when only five items exist', () => {\n    expect(findChannelIndexByLcn(entries, 802)).toBe(4);\n    expect(findChannelIndexByLcn(entries, 13)).toBe(2);\n    expect(findChannelIndexByLcn(entries, 72)).toBe(-1);\n  });\n  it('falls back to list position only for unnumbered channels', () => {\n    const mixed = [{}, { channelNumber: 13 }, {}] as Channel[];\n    expect(findChannelIndexByLcn(mixed, 2)).toBe(-1);\n    expect(findChannelIndexByLcn(mixed, 1)).toBe(0);\n    expect(findChannelIndexByLcn(mixed, 13)).toBe(1);\n    expect(channelLcn({ channelNumber: 0 }, 2)).toBe(3);\n  });\n  it('prioritizes declared number over an unnumbered positional match', () => {\n    const mixed = [{}, { channelNumber: 1 }] as Channel[];\n    expect(findChannelIndexByLcn(mixed, 1)).toBe(1);\n  });\n});\n"
+  }
+}
