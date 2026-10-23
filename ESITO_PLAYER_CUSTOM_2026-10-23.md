@@ -39,7 +39,7 @@ Serve leggere il vero modello e (se disponibile) OTA ID. Prima del root consulta
 
 ## Costi
 
-Repository pubblico; job eseguito su standard runner `ubuntu-latest`. Secondo le regole GitHub Actions i runner standard per progetti pubblici non hanno addebito di minuti. Nessuna release pubblicata, nessun piano a pagamento richiesto. Gli artifact sono temporanei (per la build n.2 il termine è 25 ottobre 2026 UTC; è stata predisposta nuova build con retention a 14 giorni).
+Repository pubblico; job eseguito su standard runner `ubuntu-latest`. Secondo le regole GitHub Actions i runner standard per progetti pubblici non hanno addebito di minuti. Nessuna release pubblicata, nessun piano a pagamento richiesto. **Build n. 3 riuscita**: https://github.com/archsgio/TV-Montecrestese-IPTV/actions/runs/40024927430 . Artifact `IPTV-Montecrestese-custom-IPK` (ZIP ~728 KB), disponibile fino al **6 novembre 2026 ore 21:13 UTC** (22:13 ora italiana). Contiene `com.archsgio.iptv_1.17.0_all.ipk`. Nessuna release ufficiale creata, nessun rooting eseguito.
 
 ## Riferimenti
 - [Documentazione e patch](webos-player-custom/README.md)
