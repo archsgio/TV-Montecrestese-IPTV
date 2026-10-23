@@ -1,0 +1,109 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="Rai.1.HD..101.it" tvg-chno="1" tvg-name="001 Rai 1" group-title="Nazionali LCN",001 Rai 1
+https://dash2.antik.sk/live/test_rai_uno_tizen/playlist.m3u8
+#EXTINF:-1 tvg-id="Rai.2.HD..102.it" tvg-chno="2" tvg-name="002 Rai 2" group-title="Nazionali LCN",002 Rai 2
+https://raidue3-live.akamaized.net/hls/live/2017983/raidue3/raidue3/playlist.m3u8
+#EXTINF:-1 tvg-id="Rai.3.HD..103.it" tvg-chno="3" tvg-name="003 Rai 3" group-title="Nazionali LCN",003 Rai 3
+https://d3k8wzt41aflvx.cloudfront.net/RAI3/Live.m3u8
+#EXTINF:-1 tvg-id="Rete.4.it" tvg-chno="4" tvg-name="004 Rete 4" group-title="Nazionali LCN",004 Rete 4
+https://live02-seg.msf.cdn.mediaset.net/live/ch-r4/r4-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="Canale.5.it" tvg-chno="5" tvg-name="005 Canale 5" group-title="Nazionali LCN",005 Canale 5
+https://live02-seg.msf.cdn.mediaset.net/live/ch-c5/c5-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="Italia.1.it" tvg-chno="6" tvg-name="006 Italia 1" group-title="Nazionali LCN",006 Italia 1
+https://live02-seg.msf.cdn.mediaset.net/live/ch-i1/i1-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="LA7.HD.it" tvg-chno="7" tvg-name="007 LA7" group-title="Nazionali LCN",007 LA7
+https://d3k8wzt41aflvx.cloudfront.net/LA7HD/Live.m3u8
+#EXTINF:-1 tvg-id="Nove.it" tvg-chno="9" tvg-name="009 NOVE" group-title="Nazionali LCN",009 NOVE
+https://streaming.aurora.enhanced.live/live/mpc/enl0eG1mLmVncmVzcy5mZDJ2eHI=/out/v1/IT_SIMULCAST/NOVE/CMAF/index.m3u8
+#EXTINF:-1 tvg-id="TelecityPiemonte.it" tvg-chno="10" tvg-name="010 Telecity Piemonte" group-title="Locali Piemonte AT01",010 Telecity Piemonte
+https://64b16f23efbee.streamlock.net/telecitypiemonte/telecitypiemonte/playlist.m3u8
+#EXTINF:-1 tvg-id="Rete7.it" tvg-chno="13" tvg-name="013 Rete 7 Piemonte" group-title="Locali Piemonte AT01",013 Rete 7 Piemonte
+https://stream.ets-sistemi.it:2020/hls/rete7-live/rete7-live.m3u8
+#EXTINF:-1 tvg-id="Primantenna.it" tvg-chno="14" tvg-name="014 Primantenna" group-title="Locali Piemonte AT01",014 Primantenna
+https://5f22d76e220e1.streamlock.net/primantenna14/primantenna14/playlist.m3u8
+#EXTINF:-1 tvg-id="GRPTV.it" tvg-chno="15" tvg-name="015 GRP TV" group-title="Locali Piemonte AT01",015 GRP TV
+https://webstream.multistream.it/memfs/a3195c96-f884-4c74-924f-2648814fc0b5.m3u8
+#EXTINF:-1 tvg-id="VCOAzzurraTV.it" tvg-chno="17" tvg-name="017 VCO Azzurra TV" group-title="Locali Piemonte AT01",017 VCO Azzurra TV
+https://wb.top-ix.org/redirect/avtvlive/azzurra/streaming?type=cdn_m3u8
+#EXTINF:-1 tvg-id="VideoNovara.it" tvg-chno="19" tvg-name="019 Video Novara" group-title="Locali Piemonte AT01",019 Video Novara
+https://ed04.top-ix.org/avtvlive/videonovara/streaming/playlist.m3u8
+#EXTINF:-1 tvg-id="20.it" tvg-chno="20" tvg-name="020 20 Mediaset" group-title="Nazionali LCN",020 20 Mediaset
+https://live02-seg.msf.cdn.mediaset.net/live/ch-lb/lb-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="Rai.4..5021.it" tvg-chno="21" tvg-name="021 Rai 4" group-title="Nazionali LCN",021 Rai 4
+https://raiquattro3-live.akamaized.net/hls/live/2018003/raiquattro3/raiquattro3/playlist.m3u8
+#EXTINF:-1 tvg-id="Iris.it" tvg-chno="22" tvg-name="022 Iris" group-title="Nazionali LCN",022 Iris
+https://live03-col.msf.cdn.mediaset.net/live/ch-ki/ki-clr.isml/manifest.mpd
+#EXTINF:-1 tvg-id="Rai.5..5023.it" tvg-chno="23" tvg-name="023 Rai 5" group-title="Nazionali LCN",023 Rai 5
+https://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=395276&output=7&forceUserAgent=rainet/4.0.5
+#EXTINF:-1 tvg-id="Rai.Movie..5024.it" tvg-chno="24" tvg-name="024 Rai Movie" group-title="Nazionali LCN",024 Rai Movie
+https://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=747002&output=7&forceUserAgent=rainet/4.0.5
+#EXTINF:-1 tvg-id="Rai.Premium..5025.it" tvg-chno="25" tvg-name="025 Rai Premium" group-title="Nazionali LCN",025 Rai Premium
+https://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=746992&output=7&forceUserAgent=rainet/4.0.5
+#EXTINF:-1 tvg-id="27.Twentyseven.it" tvg-chno="27" tvg-name="027 27 Twentyseven" group-title="Nazionali LCN",027 27 Twentyseven
+https://live02-seg.msf.cdn.mediaset.net/live/ch-ts/ts-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="TV2000.it" tvg-chno="28" tvg-name="028 TV2000" group-title="Nazionali LCN",028 TV2000
+https://hls-live-tv2000.akamaized.net/hls/live/2028510/tv2000/master.m3u8
+#EXTINF:-1 tvg-id="La.5.it" tvg-chno="30" tvg-name="030 La5" group-title="Nazionali LCN",030 La5
+https://live02-seg.msf.cdn.mediaset.net/live/ch-ka/ka-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="Real.Time.it" tvg-chno="31" tvg-name="031 Real Time" group-title="Nazionali LCN",031 Real Time
+https://streaming.aurora.enhanced.live/live/mpc/enl0eG1mLmVncmVzcy5mZDJ2eHI=/out/v1/IT_SIMULCAST/REALTIME/CMAF/index.m3u8
+#EXTINF:-1 tvg-id="QVC.it" tvg-chno="32" tvg-name="032 QVC" group-title="Nazionali LCN",032 QVC
+https://qrg.akamaized.net/hls/live/2017383/lsqvc1it/master.m3u8
+#EXTINF:-1 tvg-id="Food.Network.it" tvg-chno="33" tvg-name="033 Food Network" group-title="Nazionali LCN",033 Food Network
+https://streaming.aurora.enhanced.live/live/mpc/enl0eG1mLmVncmVzcy5mZDJ2eHI=/out/v1/IT_SIMULCAST/FOODNETWORK/CMAF/index.m3u8
+#EXTINF:-1 tvg-id="Cine34.it" tvg-chno="34" tvg-name="034 Cine34" group-title="Nazionali LCN",034 Cine34
+https://live02-seg.msf.cdn.mediaset.net/live/ch-b6/b6-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="Focus.it" tvg-chno="35" tvg-name="035 Focus" group-title="Nazionali LCN",035 Focus
+https://live02-seg.msf.cdn.mediaset.net/live/ch-fu/fu-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="RTL.102.5.HD.it" tvg-chno="36" tvg-name="036 RTL 102.5" group-title="Nazionali LCN",036 RTL 102.5
+https://dd782ed59e2a4e86aabf6fc508674b59.msvdn.net/live/S97044836/tbbP8T1ZRPBL/playlist_video.m3u8
+#EXTINF:-1 tvg-id="Giallo.TV.it" tvg-chno="38" tvg-name="038 Giallo" group-title="Nazionali LCN",038 Giallo
+https://streaming.aurora.enhanced.live/live/mpc/enl0eG1mLmVncmVzcy5mZDJ2eHI=/out/v1/IT_SIMULCAST/GIALLO/CMAF/index.m3u8
+#EXTINF:-1 tvg-id="Top.Crime.it" tvg-chno="39" tvg-name="039 Top Crime" group-title="Nazionali LCN",039 Top Crime
+https://live02-seg.msf.cdn.mediaset.net/live/ch-lt/lt-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="Boing.it" tvg-chno="40" tvg-name="040 Boing" group-title="Nazionali LCN",040 Boing
+https://live02-seg.msf.cdn.mediaset.net/live/ch-kb/kb-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="K2.it" tvg-chno="41" tvg-name="041 K2" group-title="Nazionali LCN",041 K2
+https://amg16146-wbdi-amg16146c6-samsung-it-1839.playouts.now.amagi.tv/playlist/amg16146-warnerbrosdiscoveryitalia-k2-samsungit/playlist.m3u8
+#EXTINF:-1 tvg-id="RaiGulp.it" tvg-chno="42" tvg-name="042 Rai Gulp" group-title="Nazionali LCN",042 Rai Gulp
+https://raigulp3-live.akamaized.net/hls/live/2018015/raigulp3/raigulp3/playlist.m3u8
+#EXTINF:-1 tvg-id="RaiYoyo.it" tvg-chno="43" tvg-name="043 Rai YoYo" group-title="Nazionali LCN",043 Rai YoYo
+https://raiyoyo1-dash-live.akamaized.net/dash/live/663949/raiyoyo1/manifest.mpd
+#EXTINF:-1 tvg-id="Frisbee.it" tvg-chno="44" tvg-name="044 Frisbee" group-title="Nazionali LCN",044 Frisbee
+https://d6m7lubks416z.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-zmbstsedxme9s/Frisbee_IT.m3u8
+#EXTINF:-1 tvg-id="Cartoonito.it" tvg-chno="46" tvg-name="046 Cartoonito" group-title="Nazionali LCN",046 Cartoonito
+https://live02-col.msf.cdn.mediaset.net/live/ch-la/la-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="Super!.it" tvg-chno="47" tvg-name="047 Super!" group-title="Nazionali LCN",047 Super!
+https://495c5a85d9074f29acffeaea9e0215eb.msvdn.net/super/super_main/super_main_hbbtv/playlist.m3u8
+#EXTINF:-1 tvg-id="RaiNews24.it" tvg-chno="48" tvg-name="048 Rai News 24" group-title="Nazionali LCN",048 Rai News 24
+https://d3k8wzt41aflvx.cloudfront.net/RAINEWS24/Live.m3u8
+#EXTINF:-1 tvg-id="Italia.2.it" tvg-chno="49" tvg-name="049 Italia 2" group-title="Nazionali LCN",049 Italia 2
+https://live02-col.msf.cdn.mediaset.net/live/ch-i2/i2-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="TGCom.it" tvg-chno="51" tvg-name="051 TGCOM24" group-title="Nazionali LCN",051 TGCOM24
+https://d3k8wzt41aflvx.cloudfront.net/TGCOM24/Live.m3u8
+#EXTINF:-1 tvg-id="DMAX.it" tvg-chno="52" tvg-name="052 DMAX" group-title="Nazionali LCN",052 DMAX
+https://streaming.aurora.enhanced.live/live/mpc/enl0eG1mLmVncmVzcy5mZDJ2eHI=/out/v1/IT_SIMULCAST/DMAX/CMAF/index.m3u8
+#EXTINF:-1 tvg-id="Rai.Storia..5054.it" tvg-chno="54" tvg-name="054 Rai Storia" group-title="Nazionali LCN",054 Rai Storia
+https://d3k8wzt41aflvx.cloudfront.net/RAIStoria/Live.m3u8
+#EXTINF:-1 tvg-id="Mediaset.Extra.it" tvg-chno="55" tvg-name="055 Mediaset Extra" group-title="Nazionali LCN",055 Mediaset Extra
+https://live02-seg.msf.cdn.mediaset.net/live/ch-kq/kq-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="HGTV.it" tvg-chno="56" tvg-name="056 HGTV" group-title="Nazionali LCN",056 HGTV
+https://streaming.aurora.enhanced.live/live/mpc/enl0eG1mLmVncmVzcy5mZDJ2eHI=/out/v1/IT_SIMULCAST/HGTV/CMAF/index.m3u8
+#EXTINF:-1 tvg-id="RAI.Sport...227.it" tvg-chno="58" tvg-name="058 Rai Sport" group-title="Nazionali LCN",058 Rai Sport
+https://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=358025&output=7&forceUserAgent=rainet/4.0.5
+#EXTINF:-1 tvg-id="Sportitalia.it" tvg-chno="60" tvg-name="060 Sportitalia" group-title="Nazionali LCN",060 Sportitalia
+https://edge-001.streamup.eu/sportitalia/sihd_abr/playlist.m3u8
+#EXTINF:-1 tvg-id="SuperTennis.HD.it" tvg-chno="64" tvg-name="064 SuperTennis" group-title="Nazionali LCN",064 SuperTennis
+https://live-embed.supertennix.hiway.media/restreamer/supertennix_client/gpu-a-c0-16/restreamer/outgest/aa3673f1-e178-44a9-a947-ef41db73211a/manifest.m3u8
+#EXTINF:-1 tvg-id="AlmaTV.it" tvg-chno="65" tvg-name="065 Alma TV" group-title="Nazionali LCN",065 Alma TV
+https://5f11919dca3bd.streamlock.net/almatv/almatv/playlist.m3u8
+#EXTINF:-1 tvg-id="Radio105TV.it" tvg-chno="66" tvg-name="066 Radio 105" group-title="Nazionali LCN",066 Radio 105
+https://live02-seg.msr.cdn.mediaset.net/live/ch-ec/ec-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="R101TV.it" tvg-chno="67" tvg-name="067 R101 TV" group-title="Nazionali LCN",067 R101 TV
+https://live02-seg.msr.cdn.mediaset.net/live/ch-er/er-clr.isml/index.m3u8
+#EXTINF:-1 tvg-id="DeejayTV.it" tvg-chno="69" tvg-name="069 Deejay TV" group-title="Nazionali LCN",069 Deejay TV
+https://4c4b867c89244861ac216426883d1ad0.msvdn.net/live/S85984808/sMO0tz9Sr2Rk/playlist.m3u8
+#EXTINF:-1 tvg-id="OndaNovaraTV.it" tvg-chno="80" tvg-name="080 Onda Novara TV" group-title="Locali Piemonte AT01",080 Onda Novara TV
+https://585b674743bbb.streamlock.net/9006/9006/master.m3u8
+#EXTINF:-1 tvg-id="Rai3Piemonte.it" tvg-chno="802" tvg-name="802 Rai 3 TGR Piemonte" group-title="Nazionali LCN",802 Rai 3 TGR Piemonte
+https://tgrpiemonte-live.akamaized.net/hls/live/2025569/tgrpiemonte/tgrpiemonte/playlist.m3u8
