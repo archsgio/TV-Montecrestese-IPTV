@@ -60,7 +60,7 @@ Per comandare antenna e siti ufficiali **direttamente dal nuovo catalogo dentro 
 
 ### Sicurezza della connessione
 
-Il servizio ascolta soltanto l'**indirizzo privato specificato del PC**, sulla porta TCP **8927**, e accetta solo una chiave a 256 bit. Rifiuta comandi e URL arbitrari, IP pubblici e richieste CORS da origini web ordinarie. Per il firewall Windows consentire l'ingresso TCP 8927 **solo sulla rete privata**, preferibilmente dall'indirizzo del televisore. Non usare inoltro porte sul router, VPN pubbliche o Wi-Fi ospiti.
+Il servizio ascolta soltanto l'**indirizzo privato specificato del PC**, sulla porta TCP **8927**, e accetta solo una chiave a 256 bit. Rifiuta comandi e URL arbitrari, IP pubblici e richieste CORS da origini web ordinarie. Le uniche origini browser consentite sono `null` e `file://com.archsgio.iptv`, per coprire le differenze dei contesti file delle app webOS (da confermare sul televisore). Per il firewall Windows consentire l'ingresso TCP 8927 **solo sulla rete privata**, preferibilmente dall'indirizzo del televisore. Non usare inoltro porte sul router, VPN pubbliche o Wi-Fi ospiti.
 
 Il trasporto locale è **HTTP**: non offre crittografia end-to-end. La chiave non deve attraversare reti non fidate. Alcune politiche di sicurezza dei browser webOS possono bloccare accessi HTTP dal pacchetto installato; questa compatibilità va verificata sul TV. Il PC deve essere acceso mentre si utilizza il fallback automatico.
 
