@@ -1,5 +1,19 @@
 # TV Montecrestese IPTV — catalogo LCN Piemonte/VCO
 
+## Ricerca alternativa: LG Hybrid senza root (24/10/2026)
+
+**La copertura IPTV pura resta 60 canali candidati su 85 LCN richiesti**, con 19 LCN senza URL e 6 URL già respinti nella v7. Da oggi esiste una seconda strada, **solo in preparazione, non collaudata sulla LG**:
+
+1. [Controllo DVB-T2 del sintonizzatore LG via SSAP](tools/lg-hybrid/README.md): utility per Windows/Node.js basata su `lgtv2`; `--list` legge la lista canali senza cambiare app, `--tune 802` passa alla TV terrestre nativa **solo su comando esplicito**, `--return` richiama IPTV Montecrestese. Richiede approvazione pairing sul TV e canali DTT già sintonizzati, **non root**.
+2. [Destinazioni ufficiali web](tools/lg-hybrid/official-fallbacks.json): 13 destinazioni di broadcaster (TV8, Cielo, Sky TG24, Italiana, LA7 Cinema, Primantenna, GRP, Sesta Rete, Mediapason, RBE). `--web 57` apre la pagina ufficiale RaiPlay di Italiana; **non** trasforma HTML in HLS né garantisce compatibilità webOS del player online.
+3. Possibile futura integrazione nella lista LCN della app (IPTV → DVB nativo oppure browser ufficiale, con indicatore di provenienza). **Non implementata né testata nel lettore IPK**. Il passaggio al DVB cambia applicazione: non si può incorporare il tuner nella WebApp senza ulteriore supporto hardware/firmware.
+
+**Correzione LCN 57**: Italiana è effettivamente il canale Rai subentrato a Rai Scuola **1 ottobre 2026**, disponibile sul web in diretta ufficiale https://www.raiplay.it/dirette/italiana . Il catalogo Montecrestese originale aveva il nome giusto; è errata una vecchia ipotesi di ripristinare Rai Scuola.
+
+Fonti tecniche: https://github.com/hobbyquaker/lgtv2 , https://www.home-assistant.io/integrations/webostv . Contributi e dettagli: [rapporto v10](REPORT_V10_RICERCA_IPTV_2026-10-24.md).
+
+---
+
 ## Aggiornamento v10 — recuperati due candidati, 24/10/2026
 
 **Nel solo ramo sperimentale**: 60 voci, 58 originali della v9 più **59 Discovery Turbo** (master HLS e playlist media raggiungibili) e **83 Piemonte+** (normale simulcast di Rete 7 LCN 13, possibili finestre regionali diverse). **19 posizioni senza URL**; i **6 stream bocciati sulla LG** restano esclusi dalla v10. Nessuna prova v10 sulla LG è stata ancora svolta.
