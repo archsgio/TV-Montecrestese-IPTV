@@ -1,4 +1,4 @@
-import { HYBRID_CATALOG, findHybridEntry, isIptvCandidate, type HybridEntry } from './hybrid-catalog';
+import { HYBRID_CATALOG, isIptvCandidate, type HybridEntry } from './hybrid-catalog';
 
 type Screen = 'catalog' | 'actions' | 'settings';
 type Command = 'tune' | 'web';
