@@ -42,6 +42,12 @@ jobs:
           cd upstream-player
           npm ci
           npm install --global @webos-tools/cli
+      - name: Controllo rapido TypeScript prima dei test
+        working-directory: upstream-player
+        run: npm run typecheck
+      - name: Compatibilita browser e stile prima dei test
+        working-directory: upstream-player
+        run: npm run lint
       - name: Test unitari inclusi quelli LCN
         working-directory: upstream-player
         run: npm test
