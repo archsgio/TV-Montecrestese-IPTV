@@ -1,0 +1,38 @@
+/* LG webOS 1920x1080 app-space; overlays don't mutate the base player views. */
+.hybrid-guide {
+  position: fixed; inset: 0; z-index: 23000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, .85);
+  color: #fff; font-family: 'LG Smart UI', Arial, sans-serif;
+}
+.hybrid-panel {
+  width: 1380px; max-height: 950px; padding: 42px 52px;
+  background: #131e2b; border: 3px solid #7592af; border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.hybrid-title { font-size: 44px; font-weight: 700; color: #ffdb63; }
+.hybrid-subtitle { font-size: 25px; color: #bcd0e0; padding: 6px 0 20px; }
+.hybrid-content { overflow-y: auto; flex: 1; min-height: 220px; max-height: 670px; }
+.hybrid-list { display: flex; flex-direction: column; gap: 5px; }
+.hybrid-row {
+  display: block; flex-shrink: 0; padding: 11px 18px; width: 100%;
+  font-size: 26px; min-height: 50px; text-align: left; color: #fff;
+  background: #243448; border: 2px solid transparent; border-radius: 7px;
+  white-space: normal;
+}
+.hybrid-row--focus {
+  background: #285f83; color: #fff; border-color: #ffe16b;
+  box-shadow: inset 0 0 0 2px #ffe16b;
+}
+.hybrid-heading { font-size: 38px; font-weight: 700; margin-bottom: 22px; }
+.hybrid-status { min-height: 38px; color: #ffdb63; font-size: 23px; margin-top: 14px; }
+.hybrid-help { font-size: 21px; color: #d1d8e4; margin-top: 10px; }
+.hybrid-info { font-size: 24px; line-height: 1.4; margin: 17px 0 0; color: #c3cfdf; }
+.hybrid-form { display: flex; flex-direction: column; gap: 15px; }
+.hybrid-form label { font-size: 23px; }
+.hybrid-form input {
+  display: block; font-size: 27px; padding: 16px 20px; color: #fff;
+  background: #1c2b42; border: 2px solid #8192a6; width: 100%;
+}
+.hybrid-form input:focus { outline: 4px solid #ffe16b; }
