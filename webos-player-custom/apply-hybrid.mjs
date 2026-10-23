@@ -73,7 +73,7 @@ await rewrite('src/components/virtual-numpad.ts', text => {
     `      if (!this.digits) { this.close(); this.openCatalog(); return; }
       const number = Number(this.digits);
       if (number > 0 && this.tune(number)) { this.close(); return; }
-      this.message = 'Numero non previsto nel catalogo LCN';`,
+      this.message = 'LCN non presente nella playlist';`,
     'pad routing');
   text = replaceOnce(text,
     'Frecce: sposta · OK: scegli · Indietro: chiudi',
