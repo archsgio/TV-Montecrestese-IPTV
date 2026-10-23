@@ -3,9 +3,10 @@
 // single-channel switch. Never proxies DVB, bypasses DRM, or changes firmware.
 // Requires one TV-side consent prompt for the initial pairing.
 import LGTV from 'lgtv2';
+import { readFileSync } from 'node:fs';
 
 const APP_ID = 'com.archsgio.iptv';
-const commands = ['--list', '--tune', '--return'];
+const commands = ['--list', '--tune', '--return', '--web'];
 
 function usage() {
   console.log(
@@ -13,6 +14,7 @@ function usage() {
     '  node lg-dtt.mjs --host 192.168.1.50 --list              (read-only)\n' +
     '  node lg-dtt.mjs --host 192.168.1.50 --tune 802          (explicit switch)\n' +
     '  node lg-dtt.mjs --host 192.168.1.50 --return            (launch our IPTV app)\n' +
+    '  node lg-dtt.mjs --host 192.168.1.50 --web 57            (open verified official RaiPlay)\\n' +
     '\nOnly RFC1918 private IPv4 LAN addresses are accepted.\n' +
     'The first connection requires approval on the TV; no root is required.\n'
   );
@@ -33,19 +35,20 @@ function parseArgs(args) {
   const host = args[hostIdx + 1];
   if (!privateIPv4(host)) throw Error('Refusing a non-local or invalid TV IP');
   const selected = commands.filter(c => args.includes(c));
-  if (selected.length !== 1) throw Error('Choose exactly one of --list, --tune, --return');
+  if (selected.length !== 1) throw Error('Choose exactly one of --list, --tune, --return, --web');
   const command = selected[0];
-  const lcnIdx = args.indexOf('--tune');
+  const lcnIdx = args.indexOf(command);
   let lcn = null;
-  if (command === '--tune') {
+  if (command === '--tune' || command === '--web') {
     const value = args[lcnIdx + 1];
     if (!/^[1-9]\d{0,3}$/.test(value || '')) {
-      throw Error('Provide a positive 1-to-4-digit LCN after --tune');
+      throw Error('Provide a positive 1-to-4-digit LCN after ' + command);
     }
     lcn = Number(value);
   }
   // Fail closed on mistyped flags rather than silently launching a TV command.
-  const expected = ['--host', host, command, ...(command === '--tune' ? [String(lcn)] : [])];
+  const expected = ['--host', host, command,
+    ...(['--tune', '--web'].includes(command) ? [String(lcn)] : [])];
   if (args.length !== expected.length ||
       args.some((arg, index) => arg !== expected[index])) {
     throw Error('Unexpected option or argument order: use exactly the syntax in --help');
@@ -87,6 +90,20 @@ async function run() {
     if (options.command === '--return') {
       await tv.request('ssap://com.webos.applicationManager/launch', { id: APP_ID });
       console.log('Requested LG to bring IPTV Montecrestese to foreground.');
+      return;
+    }
+
+    if (options.command === '--web') {
+      const registry = JSON.parse(readFileSync(new URL('official-fallbacks.json', import.meta.url), 'utf8'));
+      const entries = registry.entries.filter(x => x.lcn === options.lcn);
+      if (entries.length !== 1 || !entries[0].url.startsWith('https://')) {
+        throw Error('No vetted official HTTPS destination for LCN ' + options.lcn);
+      }
+      const entry = entries[0];
+      console.log('Opening official ' + entry.kind + ' page for ' + entry.name + ': ' + entry.url);
+      console.log(entry.note);
+      await tv.request('ssap://system.launcher/open', { target: entry.url });
+      console.log('Browser-open requested (actual browser video playback not guaranteed).');
       return;
     }
 
