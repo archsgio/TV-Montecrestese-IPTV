@@ -46,7 +46,7 @@
       },
       {
         "find": "    const renderedTarget = this.container.querySelector<HTMLElement>(selector);\n    if (renderedTarget && this.scrollFrame === null) {\n      this.nav.focus(renderedTarget);\n      return true;\n    }\n    const main = this.container.querySelector<HTMLElement>('.channel-main');\n    this.channelVirtualizer.ensureVisible(next, main?.clientHeight || CHANNEL_VIEWPORT_FALLBACK);",
-        "replace": "    // Always move the virtual viewport, even when the destination is already\n    // rendered, so the D-pad focus remains centered as the list moves.\n    const main = this.container.querySelector<HTMLElement>('.channel-main');\n    this.channelVirtualizer.centerOn(next, this.safeChannelViewportHeight(main));",
+        "replace": "    // The viewport recenters on every D-pad step, even when the next row\n    // is already rendered. Reuse that DOM row to avoid redrawing on held keys.\n    const renderedTarget = this.container.querySelector<HTMLElement>(selector);\n    const main = this.container.querySelector<HTMLElement>('.channel-main');\n    this.channelVirtualizer.centerOn(next, this.safeChannelViewportHeight(main));\n    if (renderedTarget && this.scrollFrame === null && main) {\n      this.scrollGuard.syncOffset(main, 'vertical', this.channelVirtualizer.scrollOffset);\n      this.nav.focus(renderedTarget);\n      return true;\n    }",
         "expected": 1
       },
       {
