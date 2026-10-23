@@ -7,6 +7,13 @@
 - Supporto specifico modello: https://www.lg.com/it/supporto/supporto-prodotto/cs-24TQ510S-WZ.API/
 - Firmware **04.60.91**: versione segnalata in precedenti verifiche sull'apparecchio; LG la elenca sul supporto per questo modello con data 15/09/2026. Da riconfermare sul televisore prima di ogni valutazione su root.
 
+## Risoluzione dell'app: verifica ufficiale
+- La risoluzione **fisica del pannello** è 1366 × 768, ma **non è automaticamente la risoluzione CSS dell'app**.
+- LG supporta `appinfo.json.resolution` = `1920x1080` (predefinita) oppure `1280x720` e consiglia di leggere `window.innerWidth/innerHeight`: https://webostv.developer.lge.com/develop/references/appinfo-json e https://webostv.developer.lge.com/develop/specifications/app-resolution
+- Nel lettore upstream v1.17.0 il file `appinfo.json` imposta esplicitamente `1920x1080`, come il viewport di `index.html` e `html,body,.view` in `css/main.css`. Quindi **il pacchetto attuale è progettato per 1920 × 1080** anche sulla TV HD Ready. Non impostare arbitrariamente `1280x720` senza riprogettare l'intero CSS.
+- Confermare comunque la risoluzione dell'app in esecuzione durante il collaudo, non confonderla con i pixel fisici del pannello.
+- Nel branch di sviluppo sono stati aggiunti test per centering 1920×1080 e 1280×720 e test del tastierino virtuale contro perdite di eventi del telecomando all'app sottostante. La loro build successiva va verificata; **la build n. 3 rimane il riferimento già verificato**.
+
 ## Implicazioni tecniche per il ramo feature/webos-iptv-lcn-focus
 1. Verificare su hardware reale a **1366 × 768** che lo scroll centrato rispetti il footer, lasci il focus sempre interamente visibile anche all'ultima riga e distingua focus, selezione e canale in riproduzione. I test con altezze simulate non sostituiscono il collaudo a 768 px.
 2. Installare **com.archsgio.iptv** come app separata in LG Developer Mode; non disinstallare o sovrascrivere l'app precedente.
