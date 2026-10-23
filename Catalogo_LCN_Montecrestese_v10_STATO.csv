@@ -55,7 +55,7 @@ LCN;Canale;Presenza URL v10;Evidenza disponibile;Stato v10;EPG XMLTV;Nota
 54;Rai Storia;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
 55;Mediaset Extra;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;NO;URL v7 mantenuto, da verificare su TV
 56;HGTV;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
-57;Italiana;NO;NON_APPLICABILE;SENZA_URL;NO;Italiana powered by Rai dal 01/10/2026 su LCN57. Diretta ufficiale: https://www.raiplay.it/dirette/italiana. Nessuna M3U verificata. -  diretta ufficiale https://www.raiplay.it/dirette/italiana -  M3U stabile non ancora verificato -  non rinominato senza conferma
+57;Italiana;NO;NON_APPLICABILE;SENZA_URL;NO;Italiana powered by Rai dal 01/10/2026 sulla LCN57. Diretta ufficiale https://www.raiplay.it/dirette/italiana. Nessuna M3U verificata.
 58;Rai Sport;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
 59;Discovery Turbo;SI;HLS_MASTER_E_MEDIA_RAGGIUNGIBILI_LG_DA_PROVARE;CANDIDATO_DA_COLLAUDARE;NO;Sorgente Discovery Turbo da iptv-org / Free-TV -  master e media playlist HLS verificati, non il video sulla LG
 60;Sportitalia;SI;NON_CONFERMATO_SINGOLARMENTE;INCLUSO;SI;URL v7 mantenuto, da verificare su TV
