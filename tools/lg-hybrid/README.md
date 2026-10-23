@@ -2,6 +2,12 @@
 
 Questa piccola utilità, basata sulla libreria MIT [hobbyquaker/lgtv2](https://github.com/hobbyquaker/lgtv2), permette di verificare **se il LG 24TQ510S-WZ espone realmente i propri canali DTT all'API SSAP**. Lo strumento non sostituisce la lista IPTV e non richiede un dispositivo di acquisizione DVB.
 
+## Perché il modello reale rende praticabile la soluzione
+
+La scheda [LG 24TQ510S-WZ](https://www.lg.com/it/tv-soundbar/tv-fino-a-32-pollici/24tq510s-wz/) conferma sintonizzatori **DVB-T/T2 HEVC Main10, DVB-C e DVB-S/S2**, **HbbTV 2.0** e navigatore web. Quindi il televisore possiede già la parte hardware per la ricezione terrestre: per il **semplice passaggio al canale Live TV nativo**, non serve un ulteriore tuner.
+
+I canali realmente disponibili dipendono dall'antenna, dalla copertura a Montecrestese e dalla scansione già eseguita sul televisore. DVB-S/S2 è un'altra potenziale sorgente se esiste un impianto satellitare compatibile; alcuni canali possono richiedere una CAM/smartcard autorizzata.
+
 ## Preparazione sul PC Windows (stessa LAN della TV)
 1. Individuare l'**indirizzo IPv4 privato della TV** nelle impostazioni di rete LG. Non inserirlo in GitHub.
 2. Installare [Node.js](https://nodejs.org/) v22.12+ sul PC se assente.
