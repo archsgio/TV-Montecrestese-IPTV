@@ -27,6 +27,10 @@ await rewrite('src/app.ts', text => {
     "import { VirtualNumpad } from './components/virtual-numpad';\nimport { HybridGuide } from './components/hybrid-guide';",
     'app import');
   text = replaceOnce(text,
+    "import { HybridGuide } from './components/hybrid-guide';",
+    "import { HybridGuide } from './components/hybrid-guide';\\nimport { findHybridEntry, isKnownBad } from './components/hybrid-catalog';",
+    'app catalog import');
+  text = replaceOnce(text,
     `  // D-pad numeric entry works even when LG reserves the physical number keys for DTT.
   private readonly numericPad = new VirtualNumpad((number) => {
     if (findChannelIndexByLcn(PlaylistService.channels, number) < 0) return false;
@@ -41,7 +45,9 @@ await rewrite('src/app.ts', text => {
   });
   // Empty VAI on the number pad opens the complete 85-LCN directory.
   private readonly numericPad = new VirtualNumpad((number) => {
-    if (findChannelIndexByLcn(PlaylistService.channels, number) < 0) {
+    const original = findHybridEntry(number);
+    if (findChannelIndexByLcn(PlaylistService.channels, number) < 0
+        || (original && isKnownBad(original))) {
       this.hybridGuide.openForLcn(number);
       return true;
     }
