@@ -14,7 +14,7 @@ function usage() {
     '  node lg-dtt.mjs --host 192.168.1.50 --list              (read-only)\n' +
     '  node lg-dtt.mjs --host 192.168.1.50 --tune 802          (explicit switch)\n' +
     '  node lg-dtt.mjs --host 192.168.1.50 --return            (launch our IPTV app)\n' +
-    '  node lg-dtt.mjs --host 192.168.1.50 --web 57            (open verified official RaiPlay)\\n' +
+    '  node lg-dtt.mjs --host 192.168.1.50 --web 57            (open verified official RaiPlay)\n' +
     '\nOnly RFC1918 private IPv4 LAN addresses are accepted.\n' +
     'The first connection requires approval on the TV; no root is required.\n'
   );
