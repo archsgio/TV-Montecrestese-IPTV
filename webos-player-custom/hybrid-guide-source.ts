@@ -252,7 +252,8 @@ export class HybridGuide {
     const config = { endpoint, token };
     if (!validateBridgeConfig(config)) {
       this.message = 'Usa IP privato, porta 1024-65535 e chiave esadecimale a 64 caratteri.';
-      this.dialog?.querySelector<HTMLElement>('.hybrid-status')!.textContent = this.message;
+      const status = this.dialog?.querySelector<HTMLElement>('.hybrid-status');
+      if (status) status.textContent = this.message;
       return;
     }
     this.config = config;
