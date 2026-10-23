@@ -51,4 +51,4 @@ jobs:
           name: IPTV-Montecrestese-custom-IPK
           path: upstream-player/com.archsgio.iptv_*.ipk
           if-no-files-found: error
-          retention-days: 2
+          retention-days: 14
