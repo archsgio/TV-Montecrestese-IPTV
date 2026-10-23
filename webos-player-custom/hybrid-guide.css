@@ -14,7 +14,8 @@
 .hybrid-title { font-size: 44px; font-weight: 700; color: #ffdb63; }
 .hybrid-subtitle { font-size: 25px; color: #bcd0e0; padding: 6px 0 20px; }
 .hybrid-content { overflow-y: auto; flex: 1; min-height: 220px; max-height: 670px; }
-.hybrid-list { display: flex; flex-direction: column; gap: 5px; }
+.hybrid-list { display: flex; flex-direction: column; }
+.hybrid-list > * + * { margin-top: 5px; }
 .hybrid-row {
   display: block; flex-shrink: 0; padding: 11px 18px; width: 100%;
   font-size: 26px; min-height: 50px; text-align: left; color: #fff;
@@ -29,7 +30,8 @@
 .hybrid-status { min-height: 38px; color: #ffdb63; font-size: 23px; margin-top: 14px; }
 .hybrid-help { font-size: 21px; color: #d1d8e4; margin-top: 10px; }
 .hybrid-info { font-size: 24px; line-height: 1.4; margin: 17px 0 0; color: #c3cfdf; }
-.hybrid-form { display: flex; flex-direction: column; gap: 15px; }
+.hybrid-form { display: flex; flex-direction: column; }
+.hybrid-form > * + * { margin-top: 15px; }
 .hybrid-form label { font-size: 23px; }
 .hybrid-form input {
   display: block; font-size: 27px; padding: 16px 20px; color: #fff;
