@@ -88,7 +88,14 @@ assert(v10Epg.entries.length === 60 && v10NoEpg.entries.length === 60, 'v10 60 e
 assert(v10Epg.entries.filter(x => x.tvgId).length === 45, 'v10 45 EPG IDs unchanged');
 assert(v10Epg.header === cleanEpg.header && v10NoEpg.header === cleanNoEpg.header, 'v10 playlist header');
 assert(latestStatus.length === 85, 'v10 catalog must preserve 85 positions');
-assert(catalog.filter(x => !v10ByLcn.has(x)).length === 19, 'v10 must leave 19 entries without stream');
+// 85 approved positions: 60 in v10, 6 known-bad explicitly excluded,
+// and 19 still missing a credible independent IPTV URL.
+assert(catalog.filter(x => !v10ByLcn.has(x)).length === 25,
+  'v10 must omit 25 positions: 6 known-bad and 19 without URL');
+assert(latestStatus.filter(row => row[4] === 'SENZA_URL').length === 19,
+  'v10 catalog must mark 19 never-sourced channels');
+assert(latestStatus.filter(row => row[4] === 'ESCLUSO_NON_FUNZIONANTE').length === 6,
+  'v10 catalog must mark exactly six rejected LG streams');
 for (const original of cleanEpg.entries) {
   const updated = v10ByLcn.get(original.lcn);
   assert(!!updated && original.meta === updated.meta && original.url === updated.url,
