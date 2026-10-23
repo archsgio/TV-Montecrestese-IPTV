@@ -70,6 +70,7 @@ LCN;Canale;Stato URL IPTV
 69;Deejay TV;Candidato non collaudato
 70;Radio Italia TV;Non disponibile
 71;Canale Italia Piemonte;Non disponibile
+72;Telelombardia;LCN personalizzata IPTV 72 - stream diretto non ancora verificato
 73;Radio Bruno TV;Non disponibile
 75;Top Calcio 24;Da integrare in IPTV - streaming ufficiale esistente, flusso diretto non verificato
 76;Valenza TV;Non disponibile
@@ -83,4 +84,3 @@ LCN;Canale;Stato URL IPTV
 98;Radio 4 You TV;Non disponibile
 101;Rai 4K;Non disponibile
 802;Rai 3 TGR Piemonte;Candidato non collaudato
-10 (Lombardia);Telelombardia;Emittente extra - LCN conflittuale con Telecity Piemonte al 10 - numerazione locale da verificare - flusso IPTV non verificato
