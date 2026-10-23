@@ -28,7 +28,7 @@ await rewrite('src/app.ts', text => {
     'app import');
   text = replaceOnce(text,
     "import { HybridGuide } from './components/hybrid-guide';",
-    "import { HybridGuide } from './components/hybrid-guide';\\nimport { findHybridEntry, isKnownBad } from './components/hybrid-catalog';",
+    "import { HybridGuide } from './components/hybrid-guide';\nimport { findHybridEntry, isKnownBad } from './components/hybrid-catalog';",
     'app catalog import');
   text = replaceOnce(text,
     `  // D-pad numeric entry works even when LG reserves the physical number keys for DTT.
