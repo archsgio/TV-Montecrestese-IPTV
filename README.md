@@ -1,5 +1,25 @@
 # TV Montecrestese IPTV — catalogo LCN Piemonte/VCO
 
+## Aggiornamento v10 — recuperati due candidati, 24/10/2026
+
+**Nel solo ramo sperimentale**: 60 voci, 58 originali della v9 più **59 Discovery Turbo** (master HLS e playlist media raggiungibili) e **83 Piemonte+** (normale simulcast di Rete 7 LCN 13, possibili finestre regionali diverse). **19 posizioni senza URL**; i **6 stream bocciati sulla LG** restano esclusi dalla v10. Nessuna prova v10 sulla LG è stata ancora svolta.
+
+- [Playlist v10 con guida XMLTV](TV_Montecrestese_LCN_v10_CANDIDATI_XMLTV_TEST.m3u), 45 `tvg-id` mappati come nella v9.
+- [Playlist v10 senza guida](TV_Montecrestese_LCN_v10_CANDIDATI_FLUSSI_TEST.m3u), utile per isolare il playback.
+- [Catalogo completo v10 con 85 posizioni](Catalogo_LCN_Montecrestese_v10_STATO.csv).
+- [Rapporto ricerca, prove dei manifest e sorgenti scartate](REPORT_V10_RICERCA_IPTV_2026-10-24.md).
+- [Validazione automatizzata](.github/workflows/lcn-playlist-qa.yml).
+
+URL importazione in player:
+```
+https://raw.githubusercontent.com/archsgio/TV-Montecrestese-IPTV/feature/webos-iptv-lcn-focus/TV_Montecrestese_LCN_v10_CANDIDATI_XMLTV_TEST.m3u
+https://raw.githubusercontent.com/archsgio/TV-Montecrestese-IPTV/feature/webos-iptv-lcn-focus/TV_Montecrestese_LCN_v10_CANDIDATI_FLUSSI_TEST.m3u
+```
+
+La v7 su `main` e la v9 nel ramo restano disponibili per ripristino. Non caricare insieme due copie dello stesso elenco.
+
+---
+
 ## Nuova v9 — elenco operativo di prova (23/10/2026)
 
 **Solo in questo ramo sperimentale; la v7 di riferimento su `main` resta invariata.** La v9 conserva gli URL dei **58** canali non bocciati sul televisore e omette i **6** già confermati non funzionanti (14, 15, 41, 44, 75, 802). Non è la lista completa: **21 LCN** restano ancora senza URL verificato.
