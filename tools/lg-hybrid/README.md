@@ -23,6 +23,18 @@ Questa piccola utilità, basata sulla libreria MIT [hobbyquaker/lgtv2](https://g
    ```
    Il lancio richiede la presenza di `com.archsgio.iptv`.
 
+## Aprire le dirette ufficiali nel browser LG (non sono URL M3U)
+
+Oltre a `--list` (sola lettura) e `--tune LCN` (DTT nativo), è previsto:
+
+```powershell
+node lg-dtt.mjs --host 192.168.1.50 --web 8
+node lg-dtt.mjs --host 192.168.1.50 --web 57
+node lg-dtt.mjs --host 192.168.1.50 --web 72
+```
+
+Questi comandi aprono **solo URL HTTPS ufficiali** presenti in `official-fallbacks.json`. L'accesso web non è un flusso M3U8 e può non riprodurre video nel browser webOS a causa di compatibilità, DRM o geolocalizzazione. Alcuni link sono pagine informative o directory di dirette: la console segnala sempre la tipologia. Non avviene alcuna estrazione di manifest o aggiramento delle restrizioni.
+
 ## Limiti reali
 - Il protocollo SSAP documenta `tv/getChannelList`, `tv/openChannel` e il lancio app, **ma non abbiamo verificato queste operazioni sulla TV dell'utente, firmware 04.60.91**. Può rispondere con 403, 404, oppure nessun elenco: registrare l'errore e non forzare nulla.
 - webOS potrebbe sospendere l'app IPTV quando entra Live TV: per un'integrazione futura occorre scegliere come tornare al player, e gestire eventuale background bridge o controllo su rete locale. Nessuna implementazione integrata nell'app è già pronta.
