@@ -74,3 +74,17 @@ Il codice `crates/screens/src/number.rs` usa il numero dichiarato dal canale (`t
 - Repos, README, codice e release GitHub dei progetti nella matrice.
 - Homebrew native Dev Mode: https://www.webosbrew.org/develop/guides/env-setup/
 - Can I Root: https://cani.rootmy.tv/
+
+## Approfondimento: Hearth (rudra-avatar/Hearth) — 23 ottobre 2026
+
+- Repository https://github.com/rudra-avatar/Hearth, creato 17 ottobre 2026; release v1.1.0 pubblicata 22 ottobre 2026, MIT, Preact/TypeScript, IPK pubblico.
+- È **un launcher**, non un player IPTV; non ha il supporto M3U, `tvg-chno`, LCN, XMLTV o i decoder HLS/DASH del nostro progetto. Non può sostituire l'app per guardare i canali.
+- Senza root è una normale app in Developer Mode, con la sola schermata di lancio e servizi di base. Il README stesso dichiara che il funzionamento sul TV *non rooted* **non è ancora confermato sul campo**. Gestione Home, autostart, aggiunta fra gli input, lettura lista app reali e sfondi USB richiedono root + Homebrew Channel.
+- `src/hooks/useKeys.ts`: la mappa dei tasti gestiti comprende frecce, Enter e Back, **non i numeri 0–9**; non offre un workaround per il tastierino numerico della LG.
+- `src/components/OptionList.tsx`: esempio concreto per il **problema della riga tagliata**. Misura `window.innerHeight - getBoundingClientRect().top - BOTTOM_SPACE` con `BOTTOM_SPACE = 60`, verifica `row.offsetTop`, `row.offsetHeight` e include **8 px** per il focus. Aggiorna il translateY così la riga attiva è totalmente visibile. **Riutilizzare il principio nella nostra lista virtuale, non il componente**.
+- `src/components/Row.tsx`: scorrimento orizzontale via `translate3d` con tile centrata e limite ai bordi; sulle frecce tenute premute preferisce movimento lineare corto (150ms) invece di continui easing che generano scatti.
+- `src/theme/global.css`: separa stati `tab--active` e `tab--focused`; tile focus con anello bianco di 5 px, ingrandimento leggero e transizioni su transform/opacity (evita repaint pesante). **Adattare stile focus per Diretta/Guida/Impostazioni, sidebar e lista canali**.
+- `src/homehook/README.md`: il bottone Home si fa reindirizzare da un helper background *root* che osserva app in primo piano; questa architettura **non** intercetta tasti numerici e non risolve il cambiocanale IPTV.
+- Issue repository aperte per webOS 3.x e recensioni su webOS C5; il README e il changelog contengono alcune indicazioni discordanti sui numeri interni webOS testati. Non assumere compatibilità del modello specifico.
+
+**Verdetto: OTTIMO DONATORE DI IDEE UI, non da installare per risolvere focus/scroll interni dell'app IPTV o numeri fisici.** Include soluzioni semplici e verificabili, da integrare nel fork selettivamente con test Playwright/Chromium legacy. Non cambia la raccomandazione principale: fork del lettore esistente + eventuale tastierino virtuale; evitare root senza necessità provata.
