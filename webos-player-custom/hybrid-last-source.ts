@@ -14,15 +14,15 @@ export function validateLastHybrid(input: unknown): LastHybridChannel | null {
   const obj = input as Partial<LastHybridChannel>;
   if (obj.source !== 'iptv' && obj.source !== 'dvb' && obj.source !== 'web') return null;
   if (!Number.isSafeInteger(obj.lcn) || (obj.lcn ?? 0) < 1 || (obj.lcn ?? 0) > 9999 ||
-      !Number.isSafeInteger(obj.at) || (obj.at ?? 0) < 0 ||
-      (obj.at ?? 0) > Date.now() + 600000) return null;
+      !Number.isSafeInteger(obj['at']) || (obj['at'] ?? 0) < 0 ||
+      (obj['at'] ?? 0) > Date.now() + 600000) return null;
   return obj as LastHybridChannel;
 }
 
 export function chooseLastHybrid(
   local: LastHybridChannel | null, remote: LastHybridChannel | null,
 ): LastHybridChannel | null {
-  return !local ? remote : !remote ? local : remote.at > local.at ? remote : local;
+  return !local ? remote : !remote ? local : remote['at'] > local['at'] ? remote : local;
 }
 
 export function getLocalLastHybrid(): LastHybridChannel | null {
