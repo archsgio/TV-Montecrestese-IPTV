@@ -9,7 +9,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import LGTV from 'lgtv2';
 import { privateIPv4, allowedOrigin as trustedOrigin, normalizedChannels, selectTunerChannel, validateAction } from './bridge-core.mjs';
-import { validatedLastSource, nativeTvForeground, currentNativeChannel } from './last-source-state.mjs';
+import { validatedLastSource, chooseLatestSourceState, nativeTvForeground, currentNativeChannel } from './last-source-state.mjs';
 
 const folder = dirname(fileURLToPath(import.meta.url));
 const reg = JSON.parse(readFileSync(join(folder, 'official-fallbacks.json'), 'utf8'));
@@ -21,9 +21,9 @@ if (existsSync(LAST_FILE)) {
   try { lastSource = validatedLastSource(JSON.parse(readFileSync(LAST_FILE, 'utf8'))); }
   catch (_e) { console.warn('Ultimo canale salvato illeggibile; stato ignorato.'); }
 }
-function rememberLastSource(source, lcn) {
-  const record = validatedLastSource({ source, lcn, at: Date.now() });
-  if (!record) throw Error('Stato ultimo canale non valido');
+function rememberLastSource(source, lcn, at = Date.now()) {
+  const record = chooseLatestSourceState(lastSource, { source, lcn, at });
+  if (record === lastSource) return lastSource;
   const tempFile = LAST_FILE + '.new';
   writeFileSync(tempFile, JSON.stringify(record) + '\n', { mode: 0o600 });
   renameSync(tempFile, LAST_FILE);
@@ -140,7 +140,8 @@ const server = http.createServer(async (request, response) => {
         send(response, 400, { error: 'Si possono registrare solo canali IPTV effettivamente avviati' });
         return;
       }
-      send(response, 200, { last: rememberLastSource('iptv', body.lcn) });
+      const eventAt = Number.isSafeInteger(body.at) ? body.at : Date.now();
+      send(response, 200, { last: rememberLastSource('iptv', body.lcn, eventAt) });
     } catch (e) { send(response, 503, { error: String(e.message || e) }); }
     return;
   }
