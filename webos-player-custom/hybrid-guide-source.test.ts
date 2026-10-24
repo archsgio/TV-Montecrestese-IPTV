@@ -70,6 +70,15 @@ describe('LG hybrid modal navigation and safety', () => {
     expect(document.querySelector('.hybrid-heading')?.textContent).toContain('002');
   });
 
+  it('opens the 85-LCN guide focused on the most recently watched LCN', () => {
+    localStorage.setItem('montecrestese_last_hybrid_channel_v1',
+      JSON.stringify({ source: 'dvb', lcn: 802, at: Date.now() }));
+    modal.openCatalog();
+    expect(document.querySelector('.hybrid-row--focus')?.textContent)
+      .toContain('802');
+    expect(tune).not.toHaveBeenCalled();
+  });
+
   it('does not offer IPTV playback for LCN 802 already rejected by LG', () => {
     modal.openForLcn(802);
     const items = Array.from(document.querySelectorAll('.hybrid-row'))
