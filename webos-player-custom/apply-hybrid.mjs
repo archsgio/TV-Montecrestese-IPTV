@@ -244,6 +244,7 @@ const sources = [
   ['montecrestese-living-room.test.ts', 'src/services/montecrestese-living-room.test.ts'],
   ['hybrid-bridge-config.ts', 'src/services/hybrid-bridge-config.ts'],
   ['hybrid-last-source.ts', 'src/services/hybrid-last-source.ts'],
+  ['native-tv-source.ts', 'src/services/native-tv-source.ts'],
   ['hybrid-last-source.test.ts', 'src/services/hybrid-last-source.test.ts'],
   ['channel-health-issues-source.ts', 'src/components/channel-health-issues.ts'],
   ['channel-health-issues-source.test.ts', 'src/components/channel-health-issues.test.ts'],
