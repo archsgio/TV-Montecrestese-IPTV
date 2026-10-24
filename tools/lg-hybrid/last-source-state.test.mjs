@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validatedLastSource, nativeTvForeground, currentNativeChannel } from './last-source-state.mjs';
+import { validatedLastSource, nativeTvForeground, currentNativeChannel, chooseLatestSourceState } from './last-source-state.mjs';
 
 test('shared last channel supports IPTV / DVB / official web with timestamps', () => {
   const at = Date.now() - 1000;
@@ -23,4 +23,15 @@ test('polling recognizes native Live TV and never overwrites IPTV while foregrou
   assert.equal(currentNativeChannel({ channelNumber: '802' }), 802);
   assert.equal(currentNativeChannel({ channelNumber: '0' }), null);
   assert.equal(currentNativeChannel({ channelNumber: 'abc' }), null);
+});
+
+test('delayed IPTV report cannot overtake a later native DVB selection', () => {
+  const t = Date.now();
+  const dvb = { source: 'dvb', lcn: 802, at: t - 100 };
+  const earlierIptv = { source: 'iptv', lcn: 6, at: t - 1000 };
+  assert.deepEqual(chooseLatestSourceState(dvb, earlierIptv), dvb);
+  const latestIptv = { source: 'iptv', lcn: 19, at: t };
+  assert.deepEqual(chooseLatestSourceState(dvb, latestIptv), latestIptv);
+  assert.deepEqual(chooseLatestSourceState(null, earlierIptv), earlierIptv);
+  assert.throws(() => chooseLatestSourceState(dvb, { source: 'unknown', lcn: 19, at: t }));
 });
