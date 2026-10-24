@@ -165,7 +165,7 @@ export class HybridGuide {
       if (entry.web) this.options.push({
         label: entry.webType === 'official_info'
           ? 'Sito dell’emittente (solo informazioni, fuori dall’app)'
-          : 'Sito ufficiale (alternativa esterna, fuori dall’app)',
+          : 'Apri sito ufficiale (alternativa esterna, fuori dall’app)',
         action: 'web',
       });
       if (this.option >= this.options.length) this.option = 0;
