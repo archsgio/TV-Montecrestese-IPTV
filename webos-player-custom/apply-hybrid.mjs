@@ -78,6 +78,52 @@ await rewrite('src/app.ts', text => {
     'visibility cleanup');
   return text;
 });
+// Distinct LCNs may intentionally simulcast the very same IPTV URL
+// (13 Rete 7 and 83 Piemonte+). Keep these as distinct TV positions.
+// Other duplicate streams with the SAME LCN retain upstream dedup behavior.
+await rewrite('src/services/playlist-service.ts', text => {
+  text = replaceOnce(text,
+    "const existing = byUrl.get(ch.url);",
+    "const lcnKey = ch.channelNumber && ch.channelNumber > 0 ? String(ch.channelNumber) : 'none';\n          const streamKey = ch.url + '#' + lcnKey;\n          const existing = byUrl.get(streamKey);",
+    'preserve distinct LCN simulcasts lookup');
+  text = replaceOnce(text,
+    "byUrl.set(ch.url, ch);",
+    "byUrl.set(streamKey, ch);",
+    'preserve distinct LCN simulcasts insertion');
+  return text;
+});
+// Accessible directly from Diretta, no need to open IPTV fullscreen first.
+await rewrite('src/components/channel-list.ts', text => {
+  text = replaceOnce(text,
+    "export interface ChannelListOptions {",
+    "export interface ChannelListOptions {\n  onOpenHybridCatalog?: () => void;",
+    'directory options');
+  text = replaceOnce(text,
+    "  private onListFocus: () => void;",
+    "  private onListFocus: () => void;\n  private onOpenHybridCatalog: () => void;",
+    'directory callback field');
+  text = replaceOnce(text,
+    "      onListFocus = () => {},",
+    "      onListFocus = () => {},\n      onOpenHybridCatalog = () => {},",
+    'directory callback default');
+  text = replaceOnce(text,
+    "    this.onListFocus = onListFocus;",
+    "    this.onListFocus = onListFocus;\n    this.onOpenHybridCatalog = onOpenHybridCatalog;",
+    'directory callback assignment');
+  text = replaceOnce(text,
+    "          ${showTabs ? html`",
+    "          <div class=\"montecrestese-catalog-shortcut\"\n               data-key=\"montecrestese:catalog\" data-focusable data-hybrid-catalog\n               aria-label=\"Elenco completo 85 LCN\">\n            Guida completa TV · 85 LCN\n          </div>\n          ${showTabs ? html`",
+    'visible 85-LCN directory entry');
+  text = replaceOnce(text,
+    "        if (focused.dataset.editChannels !== undefined) {",
+    "        if (focused.dataset.hybridCatalog !== undefined) {\n          this.onOpenHybridCatalog();\n        } else if (focused.dataset.editChannels !== undefined) {",
+    'directory OK action');
+  return text;
+});
+await rewrite('src/app.ts', text => replaceOnce(text,
+  "        onListFocus: () => this.livePreview?.leaveControls(false),",
+  "        onListFocus: () => this.livePreview?.leaveControls(false),\n        onOpenHybridCatalog: () => this.hybridGuide.openCatalog(),",
+  'app opens complete catalog from Diretta'));
 // Montecrestese default: switch on and resume live TV immediately.
 // Existing explicit OFF is stored in localStorage and remains authoritative.
 await rewrite('src/services/storage-service.ts', text => replaceOnce(text,
