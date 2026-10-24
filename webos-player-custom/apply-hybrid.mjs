@@ -84,6 +84,109 @@ await rewrite('src/services/storage-service.ts', text => replaceOnce(text,
   "return get<boolean>('auto_play', false);",
   "return get<boolean>('auto_play', true);",
   'living-room default auto-play'));
+// Startup source reconciliation is issued in parallel with playlist loading.
+// IPTV continues to use the robust saved stream key; external sources use bridge.
+await rewrite('src/app.ts', text => {
+  text = replaceOnce(text,
+    "import { HybridGuide } from './components/hybrid-guide';",
+    "import { HybridGuide } from './components/hybrid-guide';\nimport { getAbsoluteLastHybrid, restoreExternalLastHybrid } from './services/hybrid-last-source';",
+    'hybrid startup import');
+  text = replaceOnce(text,
+    "  private async loadData(forceEpgRefresh = false): Promise<void> {",
+    "  private async loadData(forceEpgRefresh = false): Promise<void> {\n    const lastHybridLookup = getAbsoluteLastHybrid();",
+    'prefetch last-channel during playlist/network load');
+  text = replaceOnce(text,
+    `      if (StorageService.getAutoPlay()) {
+        // The per-stream key survives customization and provider reshuffles.
+        const lastCh = PlaylistService.resolveLastChannelIndex(
+          StorageService.getLastChannelKey(),
+          StorageService.getLastChannel(),
+        );
+        const last = PlaylistService.channels[lastCh];
+        // A locked channel must not open a PIN prompt over a cold start.
+        if (last && ParentalControlService.decision(liveParentalRequest(last)).allowed) {
+          log.info('Auto-play resuming last channel index', lastCh);
+          this.playChannel(lastCh);
+        }
+      }`,
+    `      if (StorageService.getAutoPlay()) {
+        const lastHybrid = await lastHybridLookup;
+        if (lastHybrid && lastHybrid.source !== 'iptv') {
+          // The last watched channel may be native DVB or official browser.
+          const outcome = await restoreExternalLastHybrid(lastHybrid);
+          if (outcome === 'external-unavailable') {
+            this.hybridGuide.openForLcn(lastHybrid.lcn);
+          }
+        } else {
+          // Existing source-key handling remains the stable fallback when
+          // the installation predates the source-agnostic history.
+          const lastCh = PlaylistService.resolveLastChannelIndex(
+            StorageService.getLastChannelKey(),
+            StorageService.getLastChannel(),
+          );
+          const last = PlaylistService.channels[lastCh];
+          if (last && ParentalControlService.decision(liveParentalRequest(last)).allowed) {
+            log.info('Auto-play resuming last IPTV channel index', lastCh);
+            this.playChannel(lastCh);
+          }
+        }
+      }`,
+    'unified last-watched startup');
+  return text;
+});
+await rewrite('src/components/player.ts', text => {
+  text = replaceOnce(text,
+    "import { ChannelHealthService } from '../services/channel-health';",
+    "import { ChannelHealthService } from '../services/channel-health';\nimport { confirmedIPTVPlaying } from '../services/hybrid-last-source';\nimport { channelLcn } from '../utils/channel-lcn';",
+    'player resume import');
+  text = replaceOnce(text,
+    "      this.markTrackedLiveHealthy();",
+    `      this.markTrackedLiveHealthy();
+      if (this.liveSessionActive && this.currentChannel && this.currentIndex >= 0
+          && !this.livePreviewMode && !this.catchupInfo && !this.vod) {
+        confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));
+      }`,
+    'remember video only when playing');
+  return text;
+});
+await rewrite('src/components/settings.ts', text => {
+  text = replaceOnce(text,
+    "import { ChannelHealthService,",
+    "import { groupChannelHealthIssues } from './channel-health-issues';\nimport { ChannelHealthService,",
+    'health issue import');
+  text = replaceOnce(text,
+    "    const summary = ChannelHealthService.getSummary(channels);\n    return html`",
+    "    const summary = ChannelHealthService.getSummary(channels);\n    const issues = groupChannelHealthIssues(channels, ch => ChannelHealthService.getRecord(ch)?.status);\n    return html`",
+    'health grouped list');
+  text = replaceOnce(text,
+    `        <div class="settings-item-hint">${t('settings.channelHealthHint')}</div>`,
+    `        <div class="channel-health-issues">
+          ${([
+            { id: 'suspect', name: 'Sospetti', entries: issues.suspect },
+            { id: 'unavailable', name: 'Non disponibili', entries: issues.unavailable },
+            { id: 'unknown', name: 'Non verificati', entries: issues.unknown },
+          ]).filter(group => group.entries.length > 0).map(group => html`
+            <div class="channel-health-issue-group ${group.id}">
+              <div class="channel-health-issue-label">${group.name} (${group.entries.length})</div>
+              <div class="channel-health-issue-list">
+                ${group.entries.map(issue => html`
+                  <div class="channel-health-issue">
+                    <span class="channel-health-issue-lcn">${String(issue.lcn)}</span>
+                    <span>${issue.name}</span>
+                  </div>
+                `)}
+              </div>
+            </div>
+          `)}
+        </div>
+        <div class="settings-item-hint">${t('settings.channelHealthHint')}</div>`,
+    'under counters issue groups');
+  return text;
+});
+await rewrite('index.html', text => replaceOnce(text,
+  '<link rel="stylesheet" href="css/hybrid-guide.css">',
+  '<link rel="stylesheet" href="css/hybrid-guide.css">\n  <link rel="stylesheet" href="css/channel-health-issues.css">',
+  'health list style import'));
 await rewrite('src/components/virtual-numpad.ts', text => {
   text = replaceOnce(text,
     '  constructor(private readonly tune: (lcn: number) => boolean) {}',
@@ -119,6 +222,10 @@ const sources = [
   ['hybrid-guide.css', 'css/hybrid-guide.css'],
   ['hybrid-guide-source.test.ts', 'src/components/hybrid-guide.test.ts'],
   ['montecrestese-living-room.test.ts', 'src/services/montecrestese-living-room.test.ts'],
+  ['hybrid-last-source.ts', 'src/services/hybrid-last-source.ts'],
+  ['channel-health-issues-source.ts', 'src/components/channel-health-issues.ts'],
+  ['channel-health-issues-source.test.ts', 'src/components/channel-health-issues.test.ts'],
+  ['channel-health-issues.css', 'css/channel-health-issues.css'],
 ];
 for (const [from, to] of sources) {
   const content = await readFile(new URL(from, me), 'utf8');
