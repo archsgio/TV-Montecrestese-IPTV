@@ -1,7 +1,10 @@
-import { savedBridgeConfig } from './hybrid-bridge-config';
-/** Last verified selection shared between IPTV and the optional LG LAN bridge.
- * Timestamp is monotonic by user action, not by catalog row/highlight.
+/** TV-only last-source selection with no Mac, PC, HTTP bridge or socket.
+ * A successful native TV launch is NOT proof of a particular DVB channel:
+ * LG retains its internally tuned channel. Web launch != video playback.
  */
+import { HYBRID_CATALOG } from '../components/hybrid-catalog';
+import { openNativeLiveTv, openOfficialBrowser } from './native-tv-source';
+
 const STATE_KEY = 'montecrestese_last_hybrid_channel_v1';
 
 export type HybridSource = 'iptv' | 'dvb' | 'web';
@@ -31,67 +34,37 @@ export function getLocalLastHybrid(): LastHybridChannel | null {
   } catch (_e) { return null; }
 }
 
+/** Records a confirmed IPTV media-playing callback or an accepted app launch. */
 export function rememberHybrid(source: HybridSource, lcn: number): void {
   if (!Number.isSafeInteger(lcn) || lcn < 1 || lcn > 9999) return;
   try { localStorage.setItem(STATE_KEY, JSON.stringify({ source, lcn, at: Date.now() })); }
-  catch (_e) { /* Storage exhaustion must not stop playback. */ }
+  catch (_e) { /* Storage exhaustion must not prevent TV playback. */ }
 }
 
-async function briefRequest(url: string, init: RequestInit, timeoutMs = 1250): Promise<Response> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try { return await fetch(url, { ...init, signal: controller.signal }); }
-  finally { clearTimeout(timer); }
-}
-
-/** Records last IPTV only after the HTML5 media element fires playing. */
 export function confirmedIPTVPlaying(lcn: number): void {
   rememberHybrid('iptv', lcn);
-  const cfg = savedBridgeConfig();
-  if (!cfg) return;
-  // Do not stall playback on a stopped PC; report the media-playing time,
-  // rather than the later arrival order, to protect newer DVB selections.
-  const at = Date.now();
-  void briefRequest(cfg.endpoint + '/v1/remember', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Montecrestese-Key': cfg.token },
-    body: JSON.stringify({ source: 'iptv', lcn, at }),
-  }, 1800).catch(() => {});
 }
 
-/** Read-only reconciliation, never changes channel. */
+/** Local-only lookup: no network requests and no startup delay. */
 export async function getAbsoluteLastHybrid(): Promise<LastHybridChannel | null> {
-  const local = getLocalLastHybrid();
-  const cfg = savedBridgeConfig();
-  if (!cfg) return local;
-  try {
-    const res = await briefRequest(cfg.endpoint + '/v1/last', {
-      headers: { 'X-Montecrestese-Key': cfg.token },
-    });
-    if (!res.ok) return local;
-    const body = await res.json() as { last?: unknown };
-    return chooseLastHybrid(local, validateLastHybrid(body.last));
-  } catch (_e) { return local; }
+  return getLocalLastHybrid();
 }
 
-/** Called only when Auto Play enabled. Stops the old IPTV fallback if the most
- * recent watched source is external; never substitutes an unrelated IPTV stream.
+/** Restore last launched source, using solely this LG TV's Application Manager.
+ * On DVB this opens the TV's own last tuned channel; it cannot programmatically
+ * select the remembered LCN. An unsupported native launch leaves guide available.
  */
 export async function restoreExternalLastHybrid(
   last: LastHybridChannel,
 ): Promise<RestoreOutcome> {
   if (last.source === 'iptv') return 'iptv';
-  const cfg = savedBridgeConfig();
-  if (!cfg) return 'external-unavailable';
-  try {
-    const res = await briefRequest(cfg.endpoint + '/v1/action', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Montecrestese-Key': cfg.token },
-      body: JSON.stringify({ action: last.source === 'dvb' ? 'tune' : 'web',
-        lcn: last.lcn }),
-    }, 9500);
-    if (!res.ok) return 'external-unavailable';
-    rememberHybrid(last.source, last.lcn);
-    return 'external-restored';
-  } catch (_e) { return 'external-unavailable'; }
+  let result;
+  if (last.source === 'dvb') {
+    result = await openNativeLiveTv();
+  } else {
+    const channel = HYBRID_CATALOG.find(row => row.lcn === last.lcn);
+    if (!channel || !channel.web) return 'external-unavailable';
+    result = await openOfficialBrowser(channel.web);
+  }
+  return result.ok ? 'external-restored' : 'external-unavailable';
 }
