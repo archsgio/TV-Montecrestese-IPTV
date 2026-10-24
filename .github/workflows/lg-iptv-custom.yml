@@ -59,6 +59,8 @@ jobs:
         run: |
           node -e "const fs=require('fs');const app=JSON.parse(fs.readFileSync('appinfo.json'));const srv=JSON.parse(fs.readFileSync('bundled-service/src/services.json'));if(app.id!=='com.archsgio.iptv'||srv.id!=='com.archsgio.iptv.service')process.exit(1);console.log('Verified isolated app and service IDs')"
           find . -maxdepth 1 -name 'com.archsgio.iptv_*.ipk' -size +100k -print | grep -q .
+      - name: Ispeziona IPK reale, JS Hybrid e metadati italiani
+        run: bash webos-player-custom/verify-ipk.sh upstream-player/com.archsgio.iptv_1.17.0_all.ipk
       - name: Conserva IPK per collaudo (scadenza 2 giorni)
         uses: actions/upload-artifact@v4
         with:
