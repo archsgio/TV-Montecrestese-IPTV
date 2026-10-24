@@ -31,7 +31,7 @@ describe('TV-only last source - never requires Mac or PC', () => {
     expect(validateLastHybrid(source('dvb', 802, now))?.lcn).toBe(802);
     expect(validateLastHybrid(source('web', 57, now))?.source).toBe('web');
     expect(validateLastHybrid({ source: 'other', lcn: 802, at: now })).toBeNull();
-    expect(validateLastHybrid(source('dvb', 0, now))).toBeNull();
+    expect(validateLastHybrid(source('dvb', -1, now))).toBeNull();
   });
 
   it('uses the most recent local history independent of source', () => {
