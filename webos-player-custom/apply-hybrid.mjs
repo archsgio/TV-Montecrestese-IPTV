@@ -120,14 +120,19 @@ await rewrite('src/app.ts', text => {
         } else {
           // Existing source-key handling remains the stable fallback when
           // the installation predates the source-agnostic history.
-          const lastCh = PlaylistService.resolveLastChannelIndex(
-            StorageService.getLastChannelKey(),
-            StorageService.getLastChannel(),
-          );
-          const last = PlaylistService.channels[lastCh];
+          const lastCh = lastHybrid?.source === 'iptv'
+            ? findChannelIndexByLcn(PlaylistService.channels, lastHybrid.lcn)
+            : PlaylistService.resolveLastChannelIndex(
+              StorageService.getLastChannelKey(),
+              StorageService.getLastChannel(),
+            );
+          const last = lastCh >= 0 ? PlaylistService.channels[lastCh] : null;
           if (last && ParentalControlService.decision(liveParentalRequest(last)).allowed) {
-            log.info('Auto-play resuming last IPTV channel index', lastCh);
+            log.info('Auto-play resuming exact last IPTV LCN', lastCh);
             this.playChannel(lastCh);
+          } else if (lastHybrid?.source === 'iptv') {
+            // Source has disappeared: show it, never silently show another LCN.
+            this.hybridGuide.openForLcn(lastHybrid.lcn);
           }
         }
       }`,
@@ -157,7 +162,10 @@ await rewrite('src/components/player.ts', text => {
     'start channel warmup stopwatch');
   text = replaceOnce(text,
     "        confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));",
-    "        // From stream handoff to first real HTML5 'playing' event, not a guessed ETA.\n        const elapsedMs = Math.max(0, Date.now() - this.montecresteseSwitchStart);\n        log.info('Montecrestese IPTV channel ready', 'elapsed_ms=' + elapsedMs);\n        confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));",
+    "        // From stream handoff to first real HTML5 'playing' event, not a guessed ETA.\n        const elapsedMs = Math.max(0, Date.now() - this.montecresteseSwitchStart);\n        if (this.montecresteseSwitchStart > 0) {
+          log.info('Montecrestese IPTV channel ready', 'elapsed_ms=' + elapsedMs);
+          this.montecresteseSwitchStart = 0;
+        }\n        confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));",
     'record observed channel startup latency');
   return text;
 });
