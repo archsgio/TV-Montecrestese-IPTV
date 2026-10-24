@@ -5,17 +5,28 @@ import {
   confirmedIPTVPlaying, restoreExternalLastHybrid, getLocalLastHybrid,
 } from './hybrid-last-source';
 
+const calls = vi.hoisted(() => ({
+  live: vi.fn(), web: vi.fn(),
+}));
+vi.mock('./native-tv-source', () => ({
+  openNativeLiveTv: calls.live,
+  openOfficialBrowser: calls.web,
+}));
+
 const key = 'montecrestese_last_hybrid_channel_v1';
-const setup = 'montecrestese_hybrid_connection_v1';
-const cfg = { endpoint: 'http://192.168.1.10:8927', token: 'f'.repeat(64) };
 const source = (s: 'iptv' | 'dvb' | 'web', lcn: number, at: number) => ({
   source: s, lcn, at,
 });
 
-describe('Cross-source last watched and fast startup', () => {
-  beforeEach(() => { localStorage.clear(); vi.unstubAllGlobals(); });
+describe('TV-only last source - never requires Mac or PC', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.unstubAllGlobals();
+    calls.live.mockReset().mockResolvedValue({ ok: true, message: 'TV opened' });
+    calls.web.mockReset().mockResolvedValue({ ok: true, message: 'Browser opened' });
+  });
 
-  it('validates exactly IPTV, DVB and web entries', () => {
+  it('accepts only well-formed IPTV, DVB, and web events', () => {
     const now = Date.now();
     expect(validateLastHybrid(source('dvb', 802, now))?.lcn).toBe(802);
     expect(validateLastHybrid(source('web', 57, now))?.source).toBe('web');
@@ -23,55 +34,51 @@ describe('Cross-source last watched and fast startup', () => {
     expect(validateLastHybrid(source('dvb', 0, now))).toBeNull();
   });
 
-  it('selects the most recent channel regardless of source', () => {
-    const a = source('iptv', 13, Date.now() - 2000);
-    const b = source('dvb', 802, Date.now() - 1000);
-    expect(chooseLastHybrid(a, b)).toEqual(b);
-    expect(chooseLastHybrid(b, a)).toEqual(b);
+  it('uses the most recent local history independent of source', () => {
+    const old = source('iptv', 13, Date.now() - 2000);
+    const newer = source('dvb', 802, Date.now() - 1000);
+    expect(chooseLastHybrid(old, newer)).toEqual(newer);
+    expect(chooseLastHybrid(newer, old)).toEqual(newer);
   });
 
-  it('gets newer actual DVB from companion instead of stale IPTV local cache', async () => {
-    const a = source('iptv', 13, Date.now() - 3000);
-    const b = source('dvb', 802, Date.now() - 100);
-    localStorage.setItem(key, JSON.stringify(a));
-    localStorage.setItem(setup, JSON.stringify(cfg));
-    const network = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ last: b }) });
+  it('reads history from the TV local storage without network or bridge configuration', async () => {
+    const last = source('dvb', 802, Date.now() - 2000);
+    localStorage.setItem(key, JSON.stringify(last));
+    const network = vi.fn();
     vi.stubGlobal('fetch', network);
-    expect(await getAbsoluteLastHybrid()).toEqual(b);
-    expect(network.mock.calls[0][0]).toContain('/v1/last');
+    expect(await getAbsoluteLastHybrid()).toEqual(last);
+    expect(network).not.toHaveBeenCalled();
   });
 
-  it('keeps the correct external LCN when bridge is offline; no fallback video', async () => {
-    localStorage.setItem(key, JSON.stringify(source('dvb', 802, Date.now() - 800)));
-    expect(await getAbsoluteLastHybrid()).toEqual(getLocalLastHybrid());
-    expect(await restoreExternalLastHybrid(getLocalLastHybrid()!))
+  it('reopens native LG Live TV; LG restores its own last tuned DVB channel', async () => {
+    const last = source('dvb', 802, Date.now());
+    expect(await restoreExternalLastHybrid(last)).toBe('external-restored');
+    expect(calls.live).toHaveBeenCalledOnce();
+    expect(calls.web).not.toHaveBeenCalled();
+  });
+
+  it('reopens the official broadcaster website without any intermediary PC', async () => {
+    expect(await restoreExternalLastHybrid(source('web', 57, Date.now())))
+      .toBe('external-restored');
+    expect(calls.web).toHaveBeenCalledWith('https://www.raiplay.it/dirette/italiana');
+  });
+
+  it('does not open an arbitrary URL if missing from official channel registry', async () => {
+    expect(await restoreExternalLastHybrid(source('web', 802, Date.now())))
+      .toBe('external-unavailable');
+    expect(calls.web).not.toHaveBeenCalled();
+  });
+
+  it('does not declare a failed native launch successful', async () => {
+    calls.live.mockResolvedValueOnce({ ok: false, message: 'Not authorized' });
+    expect(await restoreExternalLastHybrid(source('dvb', 802, Date.now())))
       .toBe('external-unavailable');
   });
 
-  it('restores DVB via authenticated action but does not substitute IPTV', async () => {
-    localStorage.setItem(setup, JSON.stringify(cfg));
-    const network = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ message: 'OK' }) });
-    vi.stubGlobal('fetch', network);
-    expect(await restoreExternalLastHybrid(source('dvb', 802, Date.now())))
-      .toBe('external-restored');
-    const body = JSON.parse(network.mock.calls[0][1].body);
-    expect(body).toEqual({ action: 'tune', lcn: 802 });
-    expect(getLocalLastHybrid()?.source).toBe('dvb');
-    expect(getLocalLastHybrid()?.lcn).toBe(802);
-  });
-
-  it('records IPTV only after explicit video playing event callback, not source hover', () => {
+  it('stores IPTV playback locally only when media playing is confirmed', () => {
     expect(getLocalLastHybrid()).toBeNull();
     confirmedIPTVPlaying(59);
     expect(getLocalLastHybrid()?.source).toBe('iptv');
     expect(getLocalLastHybrid()?.lcn).toBe(59);
-  });
-
-  it('never contacts public IP or arbitrary website while resolving state', async () => {
-    localStorage.setItem(setup, JSON.stringify({ ...cfg, endpoint: 'http://8.8.8.8:8927' }));
-    const network = vi.fn();
-    vi.stubGlobal('fetch', network);
-    expect(await getAbsoluteLastHybrid()).toBeNull();
-    expect(network).not.toHaveBeenCalled();
   });
 });
