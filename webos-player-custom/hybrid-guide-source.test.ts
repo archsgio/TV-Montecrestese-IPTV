@@ -118,6 +118,26 @@ describe('TV-only hybrid navigation, no Mac/PC required', () => {
     expect(localStorage.getItem('montecrestese_last_hybrid_channel_v1')).toBeNull();
     expect(document.querySelector('.hybrid-guide')).not.toBeNull();
   });
+  it('reports -104 restricted native app launch without changing channel memory', async () => {
+    mocks.luna.mockImplementation((_uri: string, opts: {
+      onFailure?: (r: { returnValue: boolean; errorCode: number; errorText: string }) => void;
+    }) => {
+      queueMicrotask(() => opts.onFailure?.({
+        returnValue: false, errorCode: -104, errorText: 'privileged launch denied',
+      }));
+      return { cancel: vi.fn() };
+    });
+    modal.openForLcn(802);
+    const go = [...document.querySelectorAll('button.hybrid-row')]
+      .find(x => x.textContent?.includes('TV terrestre LG')) as HTMLButtonElement;
+    go.click();
+    await vi.waitFor(() =>
+      expect(document.querySelector('.hybrid-status')?.textContent).toContain('-104'));
+    expect(document.querySelector('.hybrid-status')?.textContent).toContain('HOME');
+    expect(localStorage.getItem('montecrestese_last_hybrid_channel_v1')).toBeNull();
+    expect(document.querySelector('.hybrid-guide')).not.toBeNull();
+  });
+
   it('closes safely on yellow without changing TV source', () => {
     modal.openForLcn(8);
     window.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, keyCode: 405 }));
