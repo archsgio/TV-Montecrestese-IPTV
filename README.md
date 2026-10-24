@@ -1,5 +1,17 @@
 # TV Montecrestese IPTV — catalogo LCN Piemonte/VCO
 
+## Hybrid: audit di codice e prestazioni completato (24/10/2026)
+
+- **[Build verificata #40076719422](https://github.com/archsgio/TV-Montecrestese-IPTV/actions/runs/40076719422)**: 3.428 test passati, 4 saltati, 156 suite; TypeScript, lint, IPK e bundle completati.
+- **[Rapporto tecnico e sequenza completa di collaudo](REPORT_FINALE_HYBRID_PERFORMANCE_2026-10-24.md)**: ultimo canale IPTV/DVB/web, liste dei problemi con LCN, ottimizzazioni CPU/rete e condizioni che richiedono prova sulla LG.
+- **[Playlist v10](TV_Montecrestese_LCN_v10_CANDIDATI_XMLTV_TEST.m3u)**: 60 candidate IPTV; tutti gli 85 LCN sono visibili nel catalogo dell'app. Nessun canale senza sorgente viene spacciato per riproducibile.
+- **Prestazioni**: ridisegno della lista 85 canali eliminato dai tasti freccia; SSAP riutilizza la connessione; stato di salute aggiornato fino a circa 4 volte/s; avvio IPTV strumentato con `elapsed_ms`.
+- **Memoria globale**: il ripristino considera l'ultima sorgente scelta; il bridge osserva il DTT nativo quando in funzione. In assenza del PC, l'ultima scelta esterna è conservata ma la TV deve consentire la sintonizzazione effettiva. La riproduzione web va confermata sul televisore.
+
+Nessuna installazione/collaudo hardware effettuata da GitHub Actions. La versione stabile su `main` resta intatta.
+
+---
+
 ## Esperienza d'uso quotidiana: un tasto e TV (24/10/2026)
 
 L'obiettivo è **far funzionare IPTV Montecrestese come il digitale terrestre**, evitando passaggi fra menu, configurazioni ripetute o schermate tecniche. [Requisiti e collaudo pratico](OBIETTIVO_ESPERIENZA_TV_2026-10-24.md).
