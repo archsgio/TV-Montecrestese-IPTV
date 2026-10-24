@@ -144,8 +144,7 @@ await rewrite('src/components/channel-list.test.ts', text => {
     const shortcut = container.querySelector<HTMLElement>('.montecrestese-catalog-shortcut');
     expect(shortcut?.textContent).toContain('85 LCN');
     expect(shortcut?.dataset.hybridCatalog).toBe('');
-    shortcut?.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 1, clientY: 1 }));
-    // Pointer coordinates are unavailable in jsdom, so focus and OK explicitly.
+    // jsdom doesn't support elementFromPoint; remote OK is the supported path.
     expect(onOpenHybridCatalog).not.toHaveBeenCalled();
     (list as unknown as { nav: { focus: (element: HTMLElement) => void } })
       .nav.focus(shortcut!);
