@@ -1,5 +1,15 @@
 # TV Montecrestese IPTV — catalogo LCN Piemonte/VCO
 
+## Esperienza d'uso quotidiana: un tasto e TV (24/10/2026)
+
+L'obiettivo è **far funzionare IPTV Montecrestese come il digitale terrestre**, evitando passaggi fra menu, configurazioni ripetute o schermate tecniche. [Requisiti e collaudo pratico](OBIETTIVO_ESPERIENZA_TV_2026-10-24.md).
+
+- **Avvio:** nuova configurazione con riproduzione automatica dell'ultimo canale IPTV **attiva di default** (Impostazioni → Riproduzione per scegliere OFF senza che gli aggiornamenti la riattivino). I dati di playlist e guida sono persistenti.
+- **Guida canali:** durante una trasmissione Live, **VERDE** apre con una sola pressione il catalogo completo delle 85 posizioni.
+- **Numero canale:** **GIALLO** apre il tastierino virtuale; inserire il numero LCN reale e confermare. Corretta la conversione **LCN → indice della playlist** (ad esempio 83 e 802 non sono l'83° e 802° elemento).
+- **Accesso da telecomando LG:** webOS 22 documenta Quick Access: quando l'app è aperta, tenere premuto un numero **1–8** per associarlo, poi usare una pressione prolungata per aprire l'app. Da provare sul telecomando specifico; alternativa: spostare l'icona nelle prime posizioni della Home.
+- **Nessun root**, nessuna forzatura per avviare una Developer Mode app automaticamente alla sola accensione del televisore. Il Quick Access è una funzione di sistema, diversa dai numeri brevi del digitale terrestre.
+
 ## Integrazione Hybrid nell'app — 24 ottobre 2026
 
 Il ramo sperimentale ora include la **guida interna di tutte le 85 posizioni LCN**, un selettore **IPTV / DVB-T2 nativo / sito ufficiale** e un bridge opzionale da PC Windows. Durante un canale IPTV Live: **GIALLO → VAI senza cifre** apre il catalogo; **GIALLO → digita LCN → VAI** apre la scelta delle sorgenti per i canali mancanti o i sei flussi già bocciati. Tutti gli 85 numeri sono navigabili con ↑ ↓ e OK.
