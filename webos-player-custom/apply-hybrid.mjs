@@ -151,7 +151,7 @@ await rewrite('src/components/player.ts', text => {
 });
 await rewrite('src/components/settings.ts', text => {
   text = replaceOnce(text,
-    "import { ChannelHealthService,",
+    "import {\n  ChannelHealthService,",
     "import { groupChannelHealthIssues } from './channel-health-issues';\nimport { ChannelHealthService,",
     'health issue import');
   text = replaceOnce(text,
