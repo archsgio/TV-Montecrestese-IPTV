@@ -5,6 +5,8 @@
 
 **Nota:** i report e le istruzioni del bridge delle iterazioni precedenti documentano un esperimento superato; non rappresentano più una dipendenza della build TV-only. L'ultima selezione DVB conosciuta dall'app indica la **sorgente**, non l'esatto LCN: l'ultimo canale antenna è conservato autonomamente dalla LG.
 
+**Criterio di sviluppo:** prima di aggiungere funzionalità non familiari, [confrontare progetti GitHub open source attivi, licenze, dipendenze, compatibilità e problemi noti](RICERCA_OPEN_SOURCE_PRIMA_DI_IMPLEMENTARE.md). Preferire design già verificati e il player nativo esistente; non copiare codice di provenienza o licenza incerta. Per TV8 (LCN 8) e Videogruppo (LCN 12) un sito web non equivale a uno stream integrabile.
+
 ## Hybrid: audit di codice e prestazioni completato (24/10/2026)
 
 - **[Build verificata #40076719422](https://github.com/archsgio/TV-Montecrestese-IPTV/actions/runs/40076719422)**: 3.428 test passati, 4 saltati, 156 suite; TypeScript, lint, IPK e bundle completati.
