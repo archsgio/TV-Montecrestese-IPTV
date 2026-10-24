@@ -23,3 +23,13 @@ export function currentNativeChannel(channel) {
   if (!Number.isSafeInteger(n) || n < 1 || n > 9999) return null;
   return n;
 }
+
+/** Reject a late-arriving history write from an older stream-playing event.
+ * DVB/web changes must not be overwritten by slow asynchronous IPTV POSTs.
+ */
+export function chooseLatestSourceState(previous, candidate) {
+  const next = validatedLastSource(candidate);
+  if (!next) throw Error('Invalid candidate last source');
+  const old = validatedLastSource(previous);
+  return old && old.at > next.at ? old : next;
+}
