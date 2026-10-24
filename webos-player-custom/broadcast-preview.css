@@ -1,0 +1,20 @@
+/* Single self-contained experimental tuner preview; never opens system browser. */
+.broadcast-preview {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 23500; display: flex;
+  align-items: center; justify-content: center;
+  background: #080e16; color: #fff; font-family: 'LG Smart UI', Arial, sans-serif;
+}
+.broadcast-panel {
+  width: 1400px; max-width: 96vw; max-height: 96vh; padding: 25px 38px;
+  box-sizing: border-box; border: 3px solid #7293aa; border-radius: 15px;
+  background: #111c2b; display: flex; flex-direction: column;
+}
+.broadcast-heading { font-size: 38px; color: #ffe17e; font-weight: bold; }
+.broadcast-request { font-size: 27px; margin-top: 8px; }
+.broadcast-explanation { font-size: 23px; line-height: 1.35; margin: 14px 0; }
+.broadcast-video {
+  display: block; width: 100%; min-height: 300px; height: 600px; max-height: 56vh;
+  background: #050505; object-fit: contain;
+}
+.broadcast-status { min-height: 52px; font-size: 22px; color: #ffe17e; margin-top: 12px; }
+.broadcast-help { font-size: 21px; color: #cdd9e6; margin-top: 9px; }

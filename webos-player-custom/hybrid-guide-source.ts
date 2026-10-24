@@ -1,4 +1,5 @@
 import { HYBRID_CATALOG, isIptvCandidate, type HybridEntry } from './hybrid-catalog';
+import { BroadcastPreview } from './broadcast-preview';
 import { openNativeLiveTv, openOfficialBrowser } from '../services/native-tv-source';
 import { getLocalLastHybrid, rememberHybrid } from '../services/hybrid-last-source';
 
@@ -13,8 +14,9 @@ export class HybridGuide {
   private position = 0;
   private option = 0;
   private message = '';
-  private options: { label: string; action: 'iptv' | 'tune' | 'web' }[] = [];
+  private options: { label: string; action: 'iptv' | 'broadcast' | 'tune' | 'web' }[] = [];
   private pending = false;
+  private broadcastPreview: BroadcastPreview | null = null;
 
   constructor(private readonly tuneIPTV: (lcn: number) => boolean) {}
 
@@ -39,6 +41,8 @@ export class HybridGuide {
   }
 
   close(): void {
+    this.broadcastPreview?.close();
+    this.broadcastPreview = null;
     window.removeEventListener('keydown', this.onKey, true);
     this.dialog?.parentNode?.removeChild(this.dialog);
     this.dialog = null;
@@ -61,7 +65,7 @@ export class HybridGuide {
   }
 
   private onKey = (e: KeyboardEvent): void => {
-    if (!this.dialog) return;
+    if (!this.dialog || this.broadcastPreview) return;
     const code = e.keyCode;
     if (!WATCH_KEYS.includes(code) && !(code >= 48 && code <= 57)) return;
     e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
@@ -157,6 +161,7 @@ export class HybridGuide {
       root.appendChild(summary);
       this.options = [];
       if (isIptvCandidate(entry)) this.options.push({ label: 'Guarda in IPTV', action: 'iptv' });
+      this.options.push({ label: 'Prova antenna integrata (resta nell’app · sperimentale)', action: 'broadcast' });
       this.options.push({
         label: 'Apri TV terrestre LG (ultimo canale sintonizzato)', action: 'tune',
       });
@@ -178,9 +183,10 @@ export class HybridGuide {
       root.appendChild(hint);
       const limitation = document.createElement('p');
       limitation.className = 'hybrid-info';
-      limitation.textContent = 'Nessun computer necessario. La TV terrestre apre ' +
-        'l’ultimo canale antenna della LG: la scelta esatta del LCN avviene ' +
-        'poi dal telecomando TV.';
+      limitation.textContent = 'Nessun computer necessario. La prova antenna integrata ' +
+        'mostra solo il canale GIA sintonizzato, se il firmware lo permette; ' +
+        'non cambia automaticamente il numero LCN. La TV terrestre apre ' +
+        'l’ultimo canale antenna della LG.';
       root.appendChild(limitation);
     }
     this.dialog.querySelector<HTMLElement>('.hybrid-status')!.textContent = this.message;
@@ -195,6 +201,11 @@ export class HybridGuide {
     if (item.action === 'iptv') {
       if (this.tuneIPTV(entry.lcn)) this.close();
       else { this.message = 'Il canale non è nella playlist IPTV attiva.'; this.render(); }
+      return;
+    }
+    if (item.action === 'broadcast') {
+      this.broadcastPreview = new BroadcastPreview(() => { this.broadcastPreview = null; });
+      this.broadcastPreview.open(entry);
       return;
     }
     void this.sendNativeAction(item.action, entry);

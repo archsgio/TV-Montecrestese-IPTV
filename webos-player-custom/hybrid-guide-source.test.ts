@@ -77,6 +77,25 @@ describe('TV-only hybrid navigation, no Mac/PC required', () => {
     expect(tune).toHaveBeenCalledWith(6);
     expect(mocks.luna).not.toHaveBeenCalled();
   });
+  it('opens broadcast video inside app for unsourced TV8 and returns to source menu on BACK', () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+    const pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
+    try {
+      modal.openForLcn(8);
+      const choice = [...document.querySelectorAll('button.hybrid-row')]
+        .find(x => x.textContent?.includes('antenna integrata')) as HTMLButtonElement;
+      expect(choice).not.toBeNull();
+      choice.click();
+      expect(document.querySelector('.broadcast-preview video source')?.getAttribute('src')).toBe('tv://');
+      expect(document.querySelector('.hybrid-guide')).not.toBeNull();
+      expect(mocks.luna).not.toHaveBeenCalled();
+      window.dispatchEvent(new KeyboardEvent('keydown', { keyCode: 461, bubbles: true }));
+      expect(document.querySelector('.broadcast-preview')).toBeNull();
+      expect(document.querySelector('.hybrid-guide')).not.toBeNull();
+      expect(mocks.luna).not.toHaveBeenCalled();
+    } finally { play.mockRestore(); pause.mockRestore(); }
+  });
+
   it('opens native Live TV only after explicit selection and not as fake exact LCN tune', async () => {
     modal.openForLcn(802);
     expect(mocks.luna).not.toHaveBeenCalled();

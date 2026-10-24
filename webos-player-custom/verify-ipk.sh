@@ -18,6 +18,7 @@ app="$work/usr/palm/applications/com.archsgio.iptv"
 service="$work/usr/palm/services/com.archsgio.iptv.service"
 test -s "$app/js/app.js"
 test -s "$app/css/hybrid-guide.css"
+test -s "$app/css/broadcast-preview.css"
 test -s "$app/css/virtual-numpad.css"
 test -s "$app/index.html"
 test -s "$service/services.json"
@@ -30,8 +31,11 @@ if grep -Fq 'montecrestese_hybrid_connection_v1' "$app/js/app.js"; then
   exit 1
 fi
 grep -Fq 'Catalogo Montecrestese' "$app/js/app.js"
+grep -Fq 'service/webos-broadcast' "$app/js/app.js"
+grep -Fq 'tv://' "$app/js/app.js"
 grep -Fq 'Rai 3 TGR Piemonte' "$app/js/app.js"
 grep -Fq 'hybrid-guide.css' "$app/index.html"
+grep -Fq 'broadcast-preview.css' "$app/index.html"
 grep -Fq 'virtual-numpad.css' "$app/index.html"
 
 node - "$app/appinfo.json" "$app/resources/it/appinfo.json" "$service/services.json" <<'NODE'

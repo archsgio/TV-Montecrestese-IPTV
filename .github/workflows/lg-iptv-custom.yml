@@ -41,6 +41,10 @@ jobs:
         run: node webos-player-custom/apply-unified-lcn.mjs upstream-player --dry-run
       - name: Applica integrazione Diretta 85 LCN
         run: node webos-player-custom/apply-unified-lcn.mjs upstream-player
+      - name: Valida modifica player antenna integrato senza scrivere
+        run: node webos-player-custom/apply-broadcast-preview.mjs upstream-player --dry-run
+      - name: Integra il player sperimentale DTT nella app
+        run: node webos-player-custom/apply-broadcast-preview.mjs upstream-player
       - name: Installa dipendenze e CLI LG
         run: |
           cd upstream-player
