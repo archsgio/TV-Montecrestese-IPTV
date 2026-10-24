@@ -118,6 +118,7 @@ const sources = [
   ['hybrid-guide-source.ts', 'src/components/hybrid-guide.ts'],
   ['hybrid-guide.css', 'css/hybrid-guide.css'],
   ['hybrid-guide-source.test.ts', 'src/components/hybrid-guide.test.ts'],
+  ['montecrestese-living-room.test.ts', 'src/services/montecrestese-living-room.test.ts'],
 ];
 for (const [from, to] of sources) {
   const content = await readFile(new URL(from, me), 'utf8');
