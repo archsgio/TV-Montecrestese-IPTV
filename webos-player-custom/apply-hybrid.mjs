@@ -39,8 +39,9 @@ await rewrite('src/app.ts', text => {
   });`,
     `  // Full 85-LCN hybrid guide: no dummy IPTV streams for unsourced channels.
   private readonly hybridGuide = new HybridGuide((number) => {
-    if (findChannelIndexByLcn(PlaylistService.channels, number) < 0) return false;
-    this.handleKey('number', { number });
+    const index = findChannelIndexByLcn(PlaylistService.channels, number);
+    if (index < 0) return false;
+    this.playChannel(index);
     return true;
   });
   // Empty VAI on the number pad opens the complete 85-LCN directory.
@@ -51,16 +52,38 @@ await rewrite('src/app.ts', text => {
       this.hybridGuide.openForLcn(number);
       return true;
     }
-    this.handleKey('number', { number });
+    const index = findChannelIndexByLcn(PlaylistService.channels, number);
+    this.playChannel(index);
     return true;
   }, () => this.hybridGuide.openCatalog());`,
     'app numericPad');
+  text = replaceOnce(text,
+    `    if (action === 'green' && currentView === 'player' && (this.sidebar.visible || this.menu.visible)) {
+      this.togglePlayingFavorite();
+      return;
+    }`,
+    `    if (action === 'green' && currentView === 'player' && !this.player.isVod()) {
+      if (this.sidebar.visible || this.menu.visible) {
+        this.togglePlayingFavorite();
+      } else {
+        // One keypress opens the 85-LCN directory during live TV.
+        this.hybridGuide.openCatalog();
+      }
+      return;
+    }`,
+    'green one-click guide');
   text = replaceOnce(text,
     '        this.numericPad.close();\n        this.parentalPinPrompt.dismiss();',
     '        this.numericPad.close();\n        this.hybridGuide.close();\n        this.parentalPinPrompt.dismiss();',
     'visibility cleanup');
   return text;
 });
+// Montecrestese default: switch on and resume live TV immediately.
+// Existing explicit OFF is stored in localStorage and remains authoritative.
+await rewrite('src/services/storage-service.ts', text => replaceOnce(text,
+  "return get<boolean>('auto_play', false);",
+  "return get<boolean>('auto_play', true);",
+  'living-room default auto-play'));
 await rewrite('src/components/virtual-numpad.ts', text => {
   text = replaceOnce(text,
     '  constructor(private readonly tune: (lcn: number) => boolean) {}',
