@@ -13,47 +13,32 @@ Questa guida distingue due operazioni indipendenti: **installare una volta l'app
 
 **Importante:** Developer Mode non è root; il televisore può applicare scadenze della sessione Developer Mode e le normali restrizioni delle app installate in questo modo.
 
-## B. Funzioni Hybrid con il Mac: opzionali, ma richiedono Mac acceso
+## B. Utilizzo normale: SOLO TV, Mac spento
 
-L'app contiene 85 LCN ed è utilizzabile con le sorgenti IPTV anche senza bridge. La funzione di **selezionare dal catalogo un canale del sintonizzatore LG** e seguire i cambi effettuati direttamente nella TV nativa, invece, utilizza attualmente un **bridge HTTP privato**. Può girare su macOS, ma non continua a funzionare quando il Mac dorme, è spento, è su un'altra rete oppure Terminale è chiuso.
+**Dopo aver installato l'IPK, il Mac non serve per guardare o passare fra le sorgenti.** La versione TV-only usa direttamente i servizi di sistema della LG:
 
-1. Installare dal sito ufficiale **[Node.js](https://nodejs.org/)** versione 22.12 o successiva (compatibile con l'architettura del Mac).
-2. Sul Mac aprire il repository GitHub nella branch `feature/webos-iptv-lcn-focus`, scegliere **Code → Download ZIP**, estrarlo e aprire **Terminale**. Digitare `cd ` (con spazio finale), trascinare dal Finder la cartella **`tools/lg-hybrid`** nella finestra Terminale, quindi premere Invio. Evita di scrivere percorsi complessi.
-3. Installare le dipendenze locali, **una sola volta**:
-   ```sh
-   npm install
-   ```
-4. Prima effettuare il test **di sola lettura**, sostituendo l'IP d'esempio con quello reale della TV:
-   ```sh
-   node lg-dtt.mjs --host 192.168.1.50 --list
-   ```
-   Approva sul TV il collegamento LG Connect Apps solo se compare la richiesta prevista. `--list` non cambia canale.
-5. Individuare l'indirizzo IPv4 del Mac in **Impostazioni di Sistema → Rete → Wi-Fi → Dettagli → TCP/IP** (o nell'adattatore Ethernet utilizzato). Esempio: `192.168.1.10`.
-6. Avviare il bridge sostituendo sia IP TV sia IP Mac:
-   ```sh
-   caffeinate -i node bridge-server.mjs --tv 192.168.1.50 --bind 192.168.1.10
-   ```
-   `caffeinate -i` impedisce la sospensione *per inattività* del Mac mentre il comando è in esecuzione; non garantisce funzionamento a Mac spento, chiuso in stop forzato o con Terminale terminato. La porta usata è la **8927/TCP**, solo sull'IPv4 privato specificato. Sul firewall macOS ammettere l'app Node **solo sulla rete domestica fidata**, quando il sistema chiede autorizzazione.
-7. La console mostra il collegamento `http://IP-MAC:8927` e una chiave esadecimale da 64 caratteri. Immetterli nella voce **Configura collegamento locale** della guida Hybrid sul televisore. **Non inviare la chiave in chat o su GitHub**.
-8. Per terminare il bridge, tornare al Terminale e premere **Control+C**. La riproduzione IPTV non dipende dal bridge.
+- **IPTV:** visualizzazione nella nostra app, con ripresa del canale IPTV memorizzato.
+- **TV terrestre nativa:** apertura di Live TV LG, che — come già verificato dall'utente sulla sua LG — **riparte automaticamente dall'ultimo canale terrestre effettivamente sintonizzato**, anche dopo spegnimento e riaccensione.
+- **Siti ufficiali:** apertura del browser nativo tramite webOS, quando disponibile nell'elenco approvato. La riproduzione vera del sito va provata.
+- **Guida:** VERDE mostra tutte le 85 posizioni LCN; GIALLO consente l'immissione numerica virtuale.
 
-## C. Cosa funziona con Mac spento?
+Il catalogo **non** può ancora ordinare alla TV terrestre di selezionare direttamente uno specifico LCN (es. 802). Quando si apre Live TV, la LG riprende il *suo* canale terrestre più recente. Il numero viene poi selezionato con il telecomando LG, senza Mac.
 
-| Funzione | Con Mac spento |
-|---|---|
-| Avvio IPTV e riproduzione automatica dell'ultimo canale IPTV | **Sì** |
-| Guida 85 LCN, selezione IPTV con telecomando, stato di salute | **Sì** |
-| Scelta della sorgente DVB/web dall'app e invio comando alla LG | **No**, richiede bridge attivo |
-| Rilevazione del numero terrestre cambiato via CH+/CH− nell'app Live TV LG | **No**, richiede bridge attivo |
-| Ripristino di un ultimo canale DVB/web già ricordato | La memoria locale può persistere, ma il **cambio automatico** richiede il bridge |
+La nostra app ricorda localmente se l'ultima sorgente **aperta da IPTV Montecrestese** era IPTV, DVB o web, e può tentare di riaprirla. Se invece si passa dal menu Home LG direttamente alla TV terrestre, la nostra app non osserva necessariamente quel passaggio: non promettiamo la conoscenza assoluta di tutti i cambi effettuati fuori dalla nostra app.
 
-### Obiettivo futuro
+### Nessuna installazione del bridge per l'uso quotidiano
 
-Per ottenere davvero una esperienza con **solo televisore**, senza Mac sempre acceso, occorre eliminare la dipendenza dal bridge oppure collocarlo su un dispositivo domestico sempre acceso (non necessario per iniziare le prove). Nessuna soluzione autonoma è stata ancora verificata sul firmware reale della LG. Il bridge **non installa un servizio sul televisore**.
+**NON serve eseguire `npm install`, Node.js, Terminale, `caffeinate` o `bridge-server.mjs`.** Sono strumenti di un vecchio prototipo di controllo via rete, conservato solo per ricerca. Non configurarli nella nuova build TV-only.
 
-## Riferimenti
+## C. Prova senza Mac acceso
 
-- [webOS Dev Manager: supporto Mac universale](https://github.com/webosbrew/dev-manager-desktop)
-- [Documentazione Developer Mode](https://www.webosbrew.org/devmode/)
-- [Libreria lgtv2](https://github.com/hobbyquaker/lgtv2)
-- [Comandi dettagliati del bridge](tools/lg-hybrid/README.md)
+1. Installare l'IPK dalla Mac tramite Dev Manager, poi scollegare/spegnere il Mac.
+2. Aprire IPTV Montecrestese e riprodurre un canale IPTV già funzionante.
+3. Premere VERDE e aprire la **TV terrestre LG**: dovrebbe mostrare il canale terrestre che la LG ha già memorizzato.
+4. Cambiare numero con il telecomando terrestre, spegnere/riaccendere la TV e aprire Live TV: verificare che riparta da quell'ultimo canale, come già avviene normalmente.
+5. Riaprire IPTV Montecrestese e verificare il corretto accesso alla guida e all'IPTV.
+6. Provare facoltativamente una diretta web ufficiale, annotando se il browser LG riproduce davvero audio e video.
+
+Questa verifica non richiede connessione a un computer: bisogna solo avere televisore e rete Internet per l'IPTV.
+
+[Architettura aggiornata senza PC](ARCHITETTURA_SOLO_TV_SENZA_MAC.md) · [LG Application Manager](https://webostv.developer.lge.com/develop/references/application-manager)
