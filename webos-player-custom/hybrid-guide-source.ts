@@ -98,8 +98,9 @@ export class HybridGuide {
     if (this.screen === 'catalog') {
       if (code === 38 || code === 40 || code === 33 || code === 34) {
         const delta = code === 38 ? -1 : code === 40 ? 1 : code === 33 ? -9 : 9;
+        const before = this.position;
         this.position = Math.max(0, Math.min(HYBRID_CATALOG.length - 1, this.position + delta));
-        this.render();
+        this.moveCatalogFocus(before);
       } else if (code === 13 || code === 39) {
         this.screen = 'actions'; this.option = 0; this.message = ''; this.render();
       }
@@ -112,6 +113,24 @@ export class HybridGuide {
       } else if (code === 13) this.selectOption(this.option);
     }
   };
+
+  /** Move the highlight without rebuilding 85 buttons on every remote key.
+   * Important on older LG TV CPUs, where repeated reflows add input latency.
+   */
+  private moveCatalogFocus(previous: number): void {
+    if (!this.dialog || this.screen !== 'catalog') return;
+    const list = this.dialog.querySelector<HTMLElement>('.hybrid-list');
+    const viewport = this.dialog.querySelector<HTMLElement>('.hybrid-content');
+    if (!list || !viewport) return;
+    list.children[previous]?.classList.remove('hybrid-row--focus');
+    const selected = list.children[this.position] as HTMLElement | undefined;
+    if (!selected) return;
+    selected.classList.add('hybrid-row--focus');
+    const row = selected.getBoundingClientRect();
+    const rect = viewport.getBoundingClientRect();
+    viewport.scrollTop = Math.max(0, viewport.scrollTop +
+      row.top - rect.top - (rect.height - row.height) / 2);
+  }
 
   private focusSettings(): void {
     if (!this.dialog) return;
