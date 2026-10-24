@@ -1,34 +1,12 @@
 import { HYBRID_CATALOG, isIptvCandidate, type HybridEntry } from './hybrid-catalog';
+import { savedBridgeConfig, HYBRID_BRIDGE_KEY, validateBridgeConfig, type BridgeConfig } from '../services/hybrid-bridge-config';
+export { validateBridgeConfig } from '../services/hybrid-bridge-config';
 import { getLocalLastHybrid } from '../services/hybrid-last-source';
 
 type Screen = 'catalog' | 'actions' | 'settings';
 type Command = 'tune' | 'web';
 
-const KEY = 'montecrestese_hybrid_connection_v1';
 const WATCH_KEYS = [13, 27, 37, 38, 39, 40, 405, 461, 8, 33, 34, 403, 404, 406, 412, 413, 415, 417];
-
-export interface BridgeConfig { endpoint: string; token: string }
-
-export function validateBridgeConfig(config: BridgeConfig): boolean {
-  // The remote service is deliberately limited to a private RFC1918 IP.
-  // Browser requests never receive an arbitrary destination or website URL.
-  const m = /^http:\/\/(\d+)\.(\d+)\.(\d+)\.(\d+):(\d{2,5})$/.exec(config.endpoint);
-  if (!m || !/^[0-9a-f]{64}$/i.test(config.token)) return false;
-  const v = m.slice(1, 5).map(Number);
-  const port = Number(m[5]);
-  if (v.some(n => n < 0 || n > 255) || port < 1024 || port > 65535) return false;
-  return v[0] === 10 || (v[0] === 172 && v[1] >= 16 && v[1] <= 31)
-    || (v[0] === 192 && v[1] === 168);
-}
-
-function savedConfig(): BridgeConfig | null {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return null;
-    const c = JSON.parse(raw) as BridgeConfig;
-    return validateBridgeConfig(c) ? c : null;
-  } catch (_e) { return null; }
-}
 
 export class HybridGuide {
   private dialog: HTMLElement | null = null;
@@ -37,7 +15,7 @@ export class HybridGuide {
   private option = 0;
   private settingsField = 0;
   private message = '';
-  private config: BridgeConfig | null = savedConfig();
+  private config: BridgeConfig | null = savedBridgeConfig();
   private tuner = new Map<number, string>();
   private options: { label: string; action: 'iptv' | 'tune' | 'web' | 'settings' }[] = [];
   private pending = false;
@@ -265,7 +243,7 @@ export class HybridGuide {
       return;
     }
     this.config = config;
-    try { localStorage.setItem(KEY, JSON.stringify(config)); }
+    try { localStorage.setItem(HYBRID_BRIDGE_KEY, JSON.stringify(config)); }
     catch (_e) { this.message = 'Impossibile salvare le impostazioni.'; this.render(); return; }
     this.screen = 'actions';
     this.message = 'Collegamento salvato. Controllo disponibilità canali…';
