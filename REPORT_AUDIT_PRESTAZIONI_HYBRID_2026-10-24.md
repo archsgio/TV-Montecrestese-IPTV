@@ -1,6 +1,16 @@
 # Audit tecnico e prestazionale — IPTV Montecrestese Hybrid
 _Data: 24 ottobre 2026. Sviluppo isolato nel ramo `feature/webos-iptv-lcn-focus`; non sostituisce ancora un collaudo reale LG._
 
+## Validazione finale del codice distribuito
+
+- **[GitHub Actions 40076178473](https://github.com/archsgio/TV-Montecrestese-IPTV/actions/runs/40076178473): SUCCESS** (commit sorgenti `eb0eff9eef45b890eab553ca62a7181660154650`). **156 file di test, 3.427 test superati, 4 saltati**; TypeScript, lint, packaging e ispezione dell'IPK tutti verdi.
+- **[Bridge LG static QA 40076007977](https://github.com/archsgio/TV-Montecrestese-IPTV/actions/runs/40076007977): SUCCESS**. Controlli locali senza contatto con il televisore.
+- Artifact ufficiale `IPTV-Montecrestese-custom-IPK` ID **12552978674**, disponibile su GitHub Actions fino al **7 novembre 2026**.
+- Archivio ZIP scaricato e ricontrollato, SHA256 `3e9eb0a28b447570191c3368bd054afa444d474c00bcd37f2cb50598c8e711dc` (identico al digest GitHub). Pacchetto `com.archsgio.iptv_1.17.0_all.ipk` estratto e verificato separatamente: SHA256 `9d887a0ef6e5f07189e58a8e456d411dd72c97bbef30afde42798cab7aa572b7`.
+- L'IPK estratto contiene effettivamente `montecrestese_last_hybrid_channel_v1`, `/v1/last`, `/v1/remember`, `elapsed_ms=`, l'interfaccia delle tre liste diagnostiche, la CSS relativa e il titolo italiano corretto **IPTV Montecrestese**.
+
+**Stato: collaudo software concluso; collaudo fisico LG e benchmark con cronometro ancora mancanti.** La verifica con SSAP non certifica che il browser LG riproduca una diretta web né che un flusso HLS sia stabile.
+
 ## Criteri funzionali fissati
 - **Ultimo canale assoluto**: ogni canale deve essere identificato da `{source, lcn, at}` e ripreso dalla sorgente IPTV/DVB/web effettivamente registrata più di recente. Nessuna inferenza dall'indice nella playlist, nessun ripiego silenzioso su un canale diverso. Il video IPTV viene ricordato dopo il primo evento HTML5 `playing`, non al semplice click.
 - **TV nativa**: con bridge Windows attivo e autorizzato, campionamento SSAP ogni **8 secondi** di foreground e canale sintonizzato. Cambi eseguiti con il telecomando nel tuner LG possono aggiornare la cronologia mentre il servizio PC è operativo. Se il PC è spento, disconnesso, l'API LG non risponde o la TV è spenta, **non è possibile certificare quale canale nativo sia stato visto dopo l'ultimo campionamento**.
