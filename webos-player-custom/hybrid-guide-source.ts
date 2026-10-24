@@ -1,4 +1,5 @@
 import { HYBRID_CATALOG, isIptvCandidate, type HybridEntry } from './hybrid-catalog';
+import { getLocalLastHybrid } from '../services/hybrid-last-source';
 
 type Screen = 'catalog' | 'actions' | 'settings';
 type Command = 'tune' | 'web';
@@ -45,7 +46,9 @@ export class HybridGuide {
 
   openCatalog(): void {
     if (this.dialog) return;
-    this.position = 0;
+    const last = getLocalLastHybrid();
+    const at = last ? HYBRID_CATALOG.findIndex(row => row.lcn === last.lcn) : -1;
+    this.position = at >= 0 ? at : 0;
     this.screen = 'catalog';
     this.mount();
   }
@@ -302,6 +305,8 @@ export class HybridGuide {
       const result: { error?: string; message?: string } = await response.json();
       if (!response.ok) throw new Error(result.error || 'HTTP ' + response.status);
       this.message = result.message || 'Richiesta inviata alla LG.';
+      // No extra back-click after a source switch; LG foreground is changing.
+      this.close();
     } catch (e) {
       this.message = e instanceof Error ? e.message : 'Collegamento fallito.';
     } finally {
