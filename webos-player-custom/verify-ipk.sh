@@ -21,7 +21,14 @@ test -s "$app/css/hybrid-guide.css"
 test -s "$app/css/virtual-numpad.css"
 test -s "$app/index.html"
 test -s "$service/services.json"
-grep -Fq 'montecrestese_hybrid_connection_v1' "$app/js/app.js"
+grep -Fq 'montecrestese_last_hybrid_channel_v1' "$app/js/app.js"
+grep -Fq 'luna://com.webos.applicationManager' "$app/js/app.js"
+grep -Fq 'com.webos.app.livetv' "$app/js/app.js"
+grep -Fq 'com.webos.app.browser' "$app/js/app.js"
+if grep -Fq 'montecrestese_hybrid_connection_v1' "$app/js/app.js"; then
+  echo "FAIL: obsolete Mac/PC bridge configuration compiled into TV-only player" >&2
+  exit 1
+fi
 grep -Fq 'Catalogo Montecrestese' "$app/js/app.js"
 grep -Fq 'Rai 3 TGR Piemonte' "$app/js/app.js"
 grep -Fq 'hybrid-guide.css' "$app/index.html"
@@ -42,5 +49,5 @@ if (app.id !== 'com.archsgio.iptv' ||
 }
 console.log('OK: LG app metadata, Italian locale and bundled service verified');
 NODE
-echo "OK: packaged JS includes hybrid source selector, regional LCN, browser bridge and D-pad CSS"
+echo "OK: packaged JS contains TV-only native LG launcher, last-source state, regional LCN and D-pad CSS; no Mac bridge"
 sha256sum "$IPK"
