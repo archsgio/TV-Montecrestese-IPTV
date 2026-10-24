@@ -185,7 +185,6 @@ const server = http.createServer(async (request, response) => {
 // Read-only and fail-closed: a stale tuned channel while IPTV/browser runs
 // must NEVER overwrite the real last source. Some firmwares deny the endpoint.
 let polling = false;
-let wasPaired = false;
 async function probeNativeChannel() {
   if (polling || !wasPaired) return;
   polling = true;
