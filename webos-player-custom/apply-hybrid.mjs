@@ -147,6 +147,18 @@ await rewrite('src/components/player.ts', text => {
         confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));
       }`,
     'remember video only when playing');
+  text = replaceOnce(text,
+    "export class Player {",
+    "export class Player {\n  private montecresteseSwitchStart = 0;",
+    'add one stopwatch for playback diagnostics');
+  text = replaceOnce(text,
+    "    this.loadStream(url, channel.extras);",
+    "    this.montecresteseSwitchStart = Date.now();\n    this.loadStream(url, channel.extras);",
+    'start channel warmup stopwatch');
+  text = replaceOnce(text,
+    "        confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));",
+    "        // From stream handoff to first real HTML5 'playing' event, not a guessed ETA.\n        const elapsedMs = Math.max(0, Date.now() - this.montecresteseSwitchStart);\n        log.info('Montecrestese IPTV channel ready', 'elapsed_ms=' + elapsedMs);\n        confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));",
+    'record observed channel startup latency');
   return text;
 });
 await rewrite('src/components/settings.ts', text => {
@@ -226,6 +238,7 @@ const sources = [
   ['hybrid-guide-source.test.ts', 'src/components/hybrid-guide.test.ts'],
   ['montecrestese-living-room.test.ts', 'src/services/montecrestese-living-room.test.ts'],
   ['hybrid-last-source.ts', 'src/services/hybrid-last-source.ts'],
+  ['hybrid-last-source.test.ts', 'src/services/hybrid-last-source.test.ts'],
   ['channel-health-issues-source.ts', 'src/components/channel-health-issues.ts'],
   ['channel-health-issues-source.test.ts', 'src/components/channel-health-issues.test.ts'],
   ['channel-health-issues.css', 'css/channel-health-issues.css'],
