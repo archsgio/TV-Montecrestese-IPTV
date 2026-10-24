@@ -93,8 +93,7 @@ await rewrite('src/app.ts', text => {
     'hybrid startup import');
   text = replaceOnce(text,
     "  private async loadData(forceEpgRefresh = false): Promise<void> {",
-    "  private async loadData(forceEpgRefresh = false): Promise<void> {\n    const lastHybridLookup = StorageService.getAutoPlay()
-      ? getAbsoluteLastHybrid() : Promise.resolve(null);",
+    "  private async loadData(forceEpgRefresh = false): Promise<void> {\n    const lastHybridLookup = StorageService.getAutoPlay()\n      ? getAbsoluteLastHybrid() : Promise.resolve(null);",
     'prefetch last-channel during playlist/network load');
   text = replaceOnce(text,
     `      if (StorageService.getAutoPlay()) {
@@ -153,7 +152,7 @@ await rewrite('src/components/player.ts', text => {
 await rewrite('src/components/settings.ts', text => {
   text = replaceOnce(text,
     '  private healthProgress: ChannelHealthProgress | null = null;',
-    '  private healthProgress: ChannelHealthProgress | null = null;\\n  private healthLastRedrawAt = 0;',
+    "  private healthProgress: ChannelHealthProgress | null = null;\n  private healthLastRedrawAt = 0;",
     'throttle health updates property');
   text = replaceOnce(text,
     `          this.healthProgress = progress;
