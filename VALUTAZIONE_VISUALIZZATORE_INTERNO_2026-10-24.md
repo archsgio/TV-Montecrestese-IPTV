@@ -20,6 +20,12 @@
 | 12 | Videogruppo Piemonte | https://www.mediapason.it/videogruppo/ | **No**. Pagina ufficiale con contenuti incorporati (riscontrato iframe YouTube), ma nessuna prova che il video incorporato sia la diretta 12, né che sia fruibile come player TV. | LCN presente nella guida 85; opzione antenna nativa; sito web etichettato **informativo** |
 | 13 e 83 | Rete 7 Piemonte / Piemonte+ | Stream HLS identico già in playlist v10 | **Sì come sorgente candidata**; lo stesso media mantiene entrambi gli LCN nell'elenco. | Due canali distinti che condividono il video; nuova build elimina de-duplicazione per LCN differente |
 
+## Verifiche supplementari sulla riproduzione dei canali
+
+- **TV8 HbbTV**: il sito ufficiale descrive la funzione Sky Video HbbTV gratuita sulle TV LG, ma per clip e contenuti interattivi, non come manifesto HLS pronto per il nostro player. https://www.tv8.it/app-tv8-hbbtv
+- **TV8 stream riportati da playlist esterne**: vari elenchi pubblicano vecchie URL Akamai con token temporanei; il catalogo Free-TV segnala esplicitamente il proprio flusso TV8 come **blocked** al controllo del 1 ottobre 2026. Non inserire URL bloccate, firmate, potenzialmente scadute o di origine non autorizzata come se fossero canali funzionanti.
+- **Videogruppo su aggregatori TV**: TVdream dichiara player fornito da Mediapason per la diretta Piemonte, ma nella pagina pubblica analizzata non emerge un URL iframe distinto e verificabile da integrare indipendentemente. Restano necessarie conferma di autorizzazione a incorporare e verifica fisica LG. https://www.tvdream.net/web-tv/videogruppo-piemonte/
+
 ## Decisione di progettazione
 
 - Non mettere un iframe di `tv8.it` o `mediapason.it` nel lettore predefinito. Potrebbe essere bloccato o mostrare una pagina con pubblicità/cookie/menu e senza video controllabile.
