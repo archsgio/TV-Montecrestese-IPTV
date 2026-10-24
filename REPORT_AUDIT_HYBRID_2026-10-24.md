@@ -1,5 +1,16 @@
 # Verifiche indipendenti Hybrid — 24 ottobre 2026
 
+## Esito aggiornato: pipeline completa e IPK definitivo superati
+
+- **[GitHub Actions 40072353614](https://github.com/archsgio/TV-Montecrestese-IPTV/actions/runs/40072353614): riuscita**. TypeScript, lint, 153 suite / **3.412 test superati e 4 saltati**, packaging webOS e nuovo controllo byte-level del pacchetto.
+- Artifact `IPTV-Montecrestese-custom-IPK`, ID **12551627501**, creato il 24 ottobre 2026; scade il 7 novembre 2026.
+- ZIP SHA-256 **`7e7d832098dcc597bd23782bb7eddb4c1627b01b21e1cc7b5f17d9480ed2eca3`**, ricontrollato dopo download ed estrazione.
+- IPK finale di **733314 byte**; SHA-256 **`30a0b934303a9f7ee1c601c97ae53ce3dede5d0a8bc6c85da30174cc30d4ebcf`**.
+- Esaminato `data.tar.gz` della nuova IPK: `appinfo.json` principale e `resources/it/appinfo.json` riportano ora entrambi **IPTV Montecrestese**; servizio, JavaScript Hybrid, CSS e Rai 3 TGR Piemonte presenti.
+- **[GitHub Actions 40072471019](https://github.com/archsgio/TV-Montecrestese-IPTV/actions/runs/40072471019): riuscita**. CLI e bridge usano le stesse regole testate, senza richiedere TV accesa.
+
+Nessun test software sostituisce la verifica della presa antenna, del pairing SSAP e del funzionamento del browser sulla LG: questi tre punti restano **DA COLLAUDARE SUL DISPOSITIVO**.
+
 ## Risultati ottenuti senza collegare la LG reale
 
 | Verifica | Esito | Evidenza |
