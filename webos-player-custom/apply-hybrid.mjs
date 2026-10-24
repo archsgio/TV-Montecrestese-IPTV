@@ -168,6 +168,12 @@ await rewrite('index.html', text => replaceOnce(text,
   '<link rel="stylesheet" href="css/legacy-webos-overrides.css">',
   '<link rel="stylesheet" href="css/legacy-webos-overrides.css">\n  <link rel="stylesheet" href="css/channel-health-issues.css">',
   'health list style import'));
+// Update upstream settings test double to expose the public health record API.
+// The new groups are derived from the same records as the existing counters.
+await rewrite('src/components/settings.test.ts', text => replaceOnce(text,
+  "    healthMock: {\\n      getSummary:",
+  "    healthMock: {\\n      getRecord: vi.fn(() => null),\\n      getSummary:",
+  'health record test double'));
 await rewrite('src/components/virtual-numpad.ts', text => {
   text = replaceOnce(text,
     '  constructor(private readonly tune: (lcn: number) => boolean) {}',
