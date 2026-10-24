@@ -165,8 +165,8 @@ await rewrite('src/components/settings.ts', text => {
   return text;
 });
 await rewrite('index.html', text => replaceOnce(text,
-  '<link rel="stylesheet" href="css/hybrid-guide.css">',
-  '<link rel="stylesheet" href="css/hybrid-guide.css">\n  <link rel="stylesheet" href="css/channel-health-issues.css">',
+  '<link rel="stylesheet" href="css/legacy-webos-overrides.css">',
+  '<link rel="stylesheet" href="css/legacy-webos-overrides.css">\n  <link rel="stylesheet" href="css/channel-health-issues.css">',
   'health list style import'));
 await rewrite('src/components/virtual-numpad.ts', text => {
   text = replaceOnce(text,
