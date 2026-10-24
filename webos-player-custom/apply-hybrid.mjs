@@ -152,34 +152,15 @@ await rewrite('src/components/player.ts', text => {
 await rewrite('src/components/settings.ts', text => {
   text = replaceOnce(text,
     "import {\n  ChannelHealthService,",
-    "import { groupChannelHealthIssues } from './channel-health-issues';\nimport { ChannelHealthService,",
+    "import { groupChannelHealthIssues } from './channel-health-issues';\nimport {\n  ChannelHealthService,",
     'health issue import');
   text = replaceOnce(text,
     "    const summary = ChannelHealthService.getSummary(channels);\n    return html`",
     "    const summary = ChannelHealthService.getSummary(channels);\n    const issues = groupChannelHealthIssues(channels, ch => ChannelHealthService.getRecord(ch)?.status);\n    return html`",
     'health grouped list');
   text = replaceOnce(text,
-    `        <div class="settings-item-hint">${t('settings.channelHealthHint')}</div>`,
-    `        <div class="channel-health-issues">
-          ${([
-            { id: 'suspect', name: 'Sospetti', entries: issues.suspect },
-            { id: 'unavailable', name: 'Non disponibili', entries: issues.unavailable },
-            { id: 'unknown', name: 'Non verificati', entries: issues.unknown },
-          ]).filter(group => group.entries.length > 0).map(group => html`
-            <div class="channel-health-issue-group ${group.id}">
-              <div class="channel-health-issue-label">${group.name} (${group.entries.length})</div>
-              <div class="channel-health-issue-list">
-                ${group.entries.map(issue => html`
-                  <div class="channel-health-issue">
-                    <span class="channel-health-issue-lcn">${String(issue.lcn)}</span>
-                    <span>${issue.name}</span>
-                  </div>
-                `)}
-              </div>
-            </div>
-          `)}
-        </div>
-        <div class="settings-item-hint">${t('settings.channelHealthHint')}</div>`,
+    "        <div class=\"settings-item-hint\">${t('settings.channelHealthHint')}</div>",
+    "        <div class=\"channel-health-issues\">\n          ${([\n            { id: 'suspect', name: 'Sospetti', entries: issues.suspect },\n            { id: 'unavailable', name: 'Non disponibili', entries: issues.unavailable },\n            { id: 'unknown', name: 'Non verificati', entries: issues.unknown },\n          ]).filter(group => group.entries.length > 0).map(group => html`\n            <div class=\"channel-health-issue-group ${group.id}\">\n              <div class=\"channel-health-issue-label\">${group.name} (${group.entries.length})</div>\n              <div class=\"channel-health-issue-list\">\n                ${group.entries.map(issue => html`\n                  <div class=\"channel-health-issue\">\n                    <span class=\"channel-health-issue-lcn\">${String(issue.lcn)}</span>\n                    <span>${issue.name}</span>\n                  </div>\n                `)}\n              </div>\n            </div>\n          `)}\n        </div>\n        <div class=\"settings-item-hint\">${t('settings.channelHealthHint')}</div>",
     'under counters issue groups');
   return text;
 });
