@@ -1,9 +1,8 @@
 import { HYBRID_CATALOG, isIptvCandidate, type HybridEntry } from './hybrid-catalog';
-import { savedBridgeConfig, HYBRID_BRIDGE_KEY, validateBridgeConfig, type BridgeConfig } from '../services/hybrid-bridge-config';
-export { validateBridgeConfig } from '../services/hybrid-bridge-config';
+import { openNativeLiveTv, openOfficialBrowser } from '../services/native-tv-source';
 import { getLocalLastHybrid, rememberHybrid } from '../services/hybrid-last-source';
 
-type Screen = 'catalog' | 'actions' | 'settings';
+type Screen = 'catalog' | 'actions';
 type Command = 'tune' | 'web';
 
 const WATCH_KEYS = [13, 27, 37, 38, 39, 40, 405, 461, 8, 33, 34, 403, 404, 406, 412, 413, 415, 417];
@@ -13,11 +12,8 @@ export class HybridGuide {
   private screen: Screen = 'catalog';
   private position = 0;
   private option = 0;
-  private settingsField = 0;
   private message = '';
-  private config: BridgeConfig | null = savedBridgeConfig();
-  private tuner = new Map<number, string>();
-  private options: { label: string; action: 'iptv' | 'tune' | 'web' | 'settings' }[] = [];
+  private options: { label: string; action: 'iptv' | 'tune' | 'web' }[] = [];
   private pending = false;
 
   constructor(private readonly tuneIPTV: (lcn: number) => boolean) {}
@@ -67,12 +63,6 @@ export class HybridGuide {
   private onKey = (e: KeyboardEvent): void => {
     if (!this.dialog) return;
     const code = e.keyCode;
-    // A TV's virtual keyboard must retain text input when configuring its bridge.
-    const target = e.target as HTMLElement | null;
-    if (this.screen === 'settings' && target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
-      if (![461, 405, 27, 38, 40, 13].includes(code)) return;
-      (target as HTMLInputElement).blur();
-    }
     if (!WATCH_KEYS.includes(code) && !(code >= 48 && code <= 57)) return;
     e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
     if (code === 405) { this.close(); return; }
@@ -82,19 +72,6 @@ export class HybridGuide {
       return;
     }
     if (this.pending) return;
-    if (this.screen === 'settings') {
-      if (code === 38 || code === 40) {
-        this.settingsField = Math.max(0, Math.min(3, this.settingsField + (code === 38 ? -1 : 1)));
-        this.focusSettings();
-      } else if (code === 13) {
-        if (this.settingsField < 2) {
-          this.settingsField++;
-          this.focusSettings();
-        } else if (this.settingsField === 2) this.saveSettings();
-        else { this.screen = 'actions'; this.render(); }
-      }
-      return;
-    }
     if (this.screen === 'catalog') {
       if (code === 38 || code === 40 || code === 33 || code === 34) {
         const delta = code === 38 ? -1 : code === 40 ? 1 : code === 33 ? -9 : 9;
@@ -130,15 +107,6 @@ export class HybridGuide {
     const rect = viewport.getBoundingClientRect();
     viewport.scrollTop = Math.max(0, viewport.scrollTop +
       row.top - rect.top - (rect.height - row.height) / 2);
-  }
-
-  private focusSettings(): void {
-    if (!this.dialog) return;
-    const controls = this.dialog.querySelectorAll<HTMLElement>('.hybrid-form input, .hybrid-form button');
-    for (let i = 0; i < controls.length; i++) {
-      controls[i].classList.toggle('hybrid-row--focus', i === this.settingsField);
-    }
-    controls[this.settingsField]?.focus();
   }
 
   private clearContent(): HTMLElement {
@@ -188,13 +156,14 @@ export class HybridGuide {
       summary.textContent = String(entry.lcn).padStart(3, '0') + ' · ' + entry.name;
       root.appendChild(summary);
       this.options = [];
-      if (isIptvCandidate(entry)) this.options.push({ label: 'Riproduci con IPTV', action: 'iptv' });
-      this.options.push({ label: 'Apri canale TV terrestre (richiede collegamento locale)', action: 'tune' });
-      if (entry.web) this.options.push({
-        label: 'Apri sito ufficiale' + (entry.webType === 'official_info' ? ' (solo informazioni)' : ''),
-        action: 'web',
+      if (isIptvCandidate(entry)) this.options.push({ label: 'Guarda in IPTV', action: 'iptv' });
+      this.options.push({
+        label: 'Apri TV terrestre LG (ultimo canale sintonizzato)', action: 'tune',
       });
-      this.options.push({ label: 'Configura collegamento locale', action: 'settings' });
+      if (entry.web) this.options.push({
+        label: 'Apri sito ufficiale sulla TV' +
+          (entry.webType === 'official_info' ? ' (informazioni)' : ''), action: 'web',
+      });
       if (this.option >= this.options.length) this.option = 0;
       this.options.forEach((o, i) => this.addButton(root, o.label, this.option === i, () => this.selectOption(i)));
       const hint = document.createElement('p');
@@ -203,34 +172,15 @@ export class HybridGuide {
         : entry.kind === 'SENZA_URL' ? 'Manca un flusso IPTV; provare antenna o diretta ufficiale.'
           : 'IPTV conservata come nella playlist v10. Il video dipende dalla sorgente.';
       root.appendChild(hint);
-      if (this.tuner.size) {
-        const tuned = document.createElement('p');
-        tuned.className = 'hybrid-info';
-        tuned.textContent = this.tuner.has(entry.lcn)
-          ? 'Sintonizzatore: ' + this.tuner.get(entry.lcn)
-          : 'Canale non presente nell’ultima scansione del sintonizzatore';
-        root.appendChild(tuned);
-      }
-    } else {
-      const form = document.createElement('div');
-      form.className = 'hybrid-form';
-      const label1 = document.createElement('label');
-      label1.textContent = 'Indirizzo bridge sul PC (es. http://192.168.1.10:8927)';
-      const endpoint = document.createElement('input');
-      endpoint.id = 'hybrid-endpoint'; endpoint.type = 'text';
-      endpoint.value = this.config?.endpoint || '';
-      const label2 = document.createElement('label');
-      label2.textContent = 'Chiave di accoppiamento (64 caratteri)';
-      const token = document.createElement('input');
-      token.id = 'hybrid-token'; token.type = 'password';
-      token.value = this.config?.token || '';
-      form.appendChild(label1); form.appendChild(endpoint); form.appendChild(label2); form.appendChild(token);
-      this.addButton(form, 'Salva e controlla i canali del TV', false, () => this.saveSettings());
-      this.addButton(form, 'Annulla', false, () => { this.screen = 'actions'; this.render(); });
-      root.appendChild(form);
+      const limitation = document.createElement('p');
+      limitation.className = 'hybrid-info';
+      limitation.textContent = 'Nessun computer necessario. La TV terrestre apre ' +
+        'l’ultimo canale antenna della LG: la scelta esatta del LCN avviene ' +
+        'poi dal telecomando TV.';
+      root.appendChild(limitation);
     }
     this.dialog.querySelector<HTMLElement>('.hybrid-status')!.textContent = this.message;
-    if (this.screen === 'settings') this.focusSettings();
+
   }
 
   private selectOption(index: number): void {
@@ -238,77 +188,33 @@ export class HybridGuide {
     const item = this.options[index];
     if (!item) return;
     const entry = HYBRID_CATALOG[this.position];
-    if (item.action === 'settings') { this.screen = 'settings'; this.settingsField = 0; this.message = ''; this.render(); return; }
     if (item.action === 'iptv') {
       if (this.tuneIPTV(entry.lcn)) this.close();
       else { this.message = 'Il canale non è nella playlist IPTV attiva.'; this.render(); }
       return;
     }
-    if (!this.config) {
-      this.screen = 'settings'; this.settingsField = 0; this.message = 'Per il cambio automatico serve il servizio locale sul PC.'; this.render();
-      return;
-    }
-    this.sendCommand(item.action, entry);
+    void this.sendNativeAction(item.action, entry);
   }
 
-  private saveSettings(): void {
-    const endpoint = this.dialog?.querySelector<HTMLInputElement>('#hybrid-endpoint')?.value.trim() || '';
-    const token = this.dialog?.querySelector<HTMLInputElement>('#hybrid-token')?.value.trim() || '';
-    const config = { endpoint, token };
-    if (!validateBridgeConfig(config)) {
-      this.message = 'Usa IP privato, porta 1024-65535 e chiave esadecimale a 64 caratteri.';
-      const status = this.dialog?.querySelector<HTMLElement>('.hybrid-status');
-      if (status) status.textContent = this.message;
-      return;
-    }
-    this.config = config;
-    try { localStorage.setItem(HYBRID_BRIDGE_KEY, JSON.stringify(config)); }
-    catch (_e) { this.message = 'Impossibile salvare le impostazioni.'; this.render(); return; }
-    this.screen = 'actions';
-    this.message = 'Collegamento salvato. Controllo disponibilità canali…';
-    this.render();
-    void this.fetchChannels();
-  }
-
-  private async fetchChannels(): Promise<void> {
-    if (!this.config) return;
-    try {
-      const response = await fetch(this.config.endpoint + '/v1/channels', {
-        headers: { 'X-Montecrestese-Key': this.config.token },
-      });
-      if (!response.ok) throw new Error('HTTP ' + response.status);
-      const data: { channels?: { lcn: number; name: string }[] } = await response.json();
-      this.tuner = new Map((data.channels || []).map(ch => [ch.lcn, ch.name]));
-      this.message = 'Tuner collegato: ' + this.tuner.size + ' posizioni ricevute.';
-    } catch (_e) {
-      this.message = 'Bridge non raggiungibile. Verifica IP, chiave e firewall sul PC.';
-    }
-    if (this.dialog) this.render();
-  }
-
-  private async sendCommand(command: Command, entry: HybridEntry): Promise<void> {
-    if (!this.config || this.pending) return;
+  private async sendNativeAction(command: Command, entry: HybridEntry): Promise<void> {
+    if (this.pending) return;
     this.pending = true;
-    this.message = 'Richiesta in corso…';
+    this.message = 'Apertura sulla LG…';
     this.render();
     try {
-      const response = await fetch(this.config.endpoint + '/v1/action', {
-        method: 'POST', headers: {
-          'Content-Type': 'application/json',
-          'X-Montecrestese-Key': this.config.token,
-        },
-        body: JSON.stringify({ action: command, lcn: entry.lcn }),
-      });
-      const result: { error?: string; message?: string } = await response.json();
-      if (!response.ok) throw new Error(result.error || 'HTTP ' + response.status);
-      // Preserve the last successful source locally too: if the PC is later
-      // offline we must NOT resume an older IPTV channel instead.
+      const result = command === 'tune'
+        ? await openNativeLiveTv()
+        : await openOfficialBrowser(entry.web);
+      if (!result.ok) {
+        this.message = result.message;
+        return;
+      }
+      // This is the last requested source. For native DTT the numeric LCN
+      // is NOT independently confirmed: Live TV controls its own tuner.
       rememberHybrid(command === 'tune' ? 'dvb' : 'web', entry.lcn);
-      this.message = result.message || 'Richiesta inviata alla LG.';
-      // No extra back-click after a source switch; LG foreground is changing.
       this.close();
-    } catch (e) {
-      this.message = e instanceof Error ? e.message : 'Collegamento fallito.';
+    } catch (_e) {
+      this.message = 'Impossibile aprire la sorgente dal televisore.';
     } finally {
       this.pending = false;
       if (this.dialog) this.render();
