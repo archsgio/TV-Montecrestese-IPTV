@@ -1,15 +1,17 @@
 # TV Montecrestese IPTV — catalogo LCN Piemonte/VCO
 
-> **Installazione dal Mac (Intel o Apple Silicon)** — non serve un PC Windows. [Guida macOS passo per passo](GUIDA_INSTALLAZIONE_MACOS_LG_HYBRID.md). Il Mac è necessario solo per installare l'IPK; il bridge facoltativo DVB/web si può eseguire sullo stesso Mac, ma deve restare acceso durante i cambi sorgente automatici. L'IPTV e la guida 85 LCN continuano a funzionare con Mac spento.
+> **Versione TV-only senza Mac/PC acceso** — il Mac serve soltanto per installare o aggiornare l'IPK. Le fonti IPTV, TV terrestre LG e browser ufficiale vengono avviate dalla TV senza bridge esterno. La LG ricorda già da sé l'ultimo canale terrestre sintonizzato. [Architettura attuale](ARCHITETTURA_SOLO_TV_SENZA_MAC.md) · [Guida installazione macOS](GUIDA_INSTALLAZIONE_MACOS_LG_HYBRID.md). La compatibilità dei comandi nativi richiede collaudo sul TV.
 
+
+**Nota:** i report e le istruzioni del bridge delle iterazioni precedenti documentano un esperimento superato; non rappresentano più una dipendenza della build TV-only. L'ultima selezione DVB conosciuta dall'app indica la **sorgente**, non l'esatto LCN: l'ultimo canale antenna è conservato autonomamente dalla LG.
 
 ## Hybrid: audit di codice e prestazioni completato (24/10/2026)
 
 - **[Build verificata #40076719422](https://github.com/archsgio/TV-Montecrestese-IPTV/actions/runs/40076719422)**: 3.428 test passati, 4 saltati, 156 suite; TypeScript, lint, IPK e bundle completati.
 - **[Rapporto tecnico e sequenza completa di collaudo](REPORT_FINALE_HYBRID_PERFORMANCE_2026-10-24.md)**: ultimo canale IPTV/DVB/web, liste dei problemi con LCN, ottimizzazioni CPU/rete e condizioni che richiedono prova sulla LG.
 - **[Playlist v10](TV_Montecrestese_LCN_v10_CANDIDATI_XMLTV_TEST.m3u)**: 60 candidate IPTV; tutti gli 85 LCN sono visibili nel catalogo dell'app. Nessun canale senza sorgente viene spacciato per riproducibile.
-- **Prestazioni**: ridisegno della lista 85 canali eliminato dai tasti freccia; SSAP riutilizza la connessione; stato di salute aggiornato fino a circa 4 volte/s; avvio IPTV strumentato con `elapsed_ms`.
-- **Memoria globale**: il ripristino considera l'ultima sorgente scelta; il bridge osserva il DTT nativo quando in funzione. In assenza del PC, l'ultima scelta esterna è conservata ma la TV deve consentire la sintonizzazione effettiva. La riproduzione web va confermata sul televisore.
+- **Prestazioni**: ridisegno della lista 85 canali eliminato dai tasti freccia; stato di salute aggiornato fino a circa 4 volte/s; avvio IPTV strumentato con `elapsed_ms`; nessun socket al PC per cambiare fonte.
+- **Memoria delle sorgenti**: l'app ricorda la fonte aperta da sé; la LG ricorda l'ultimo canale terrestre reale. I cambi fatti al di fuori dell'app non sono osservabili in modo affidabile; l'eventuale video web va confermato sul televisore.
 
 Nessuna installazione/collaudo hardware effettuata da GitHub Actions. La versione stabile su `main` resta intatta.
 
@@ -27,9 +29,9 @@ L'obiettivo è **far funzionare IPTV Montecrestese come il digitale terrestre**,
 
 ## Integrazione Hybrid nell'app — 24 ottobre 2026
 
-Il ramo sperimentale ora include la **guida interna di tutte le 85 posizioni LCN**, un selettore **IPTV / DVB-T2 nativo / sito ufficiale** e un bridge opzionale da PC Windows. Durante un canale IPTV Live: **GIALLO → VAI senza cifre** apre il catalogo; **GIALLO → digita LCN → VAI** apre la scelta delle sorgenti per i canali mancanti o i sei flussi già bocciati. Tutti gli 85 numeri sono navigabili con ↑ ↓ e OK.
+Il ramo sperimentale ora include la **guida interna di tutte le 85 posizioni LCN**, un selettore **IPTV / DVB-T2 nativo / sito ufficiale** senza PC/Mac in esecuzione. Durante un canale IPTV Live: **GIALLO → VAI senza cifre** apre il catalogo; **GIALLO → digita LCN → VAI** apre la scelta delle sorgenti per i canali mancanti o i sei flussi già bocciati. Tutti gli 85 numeri sono navigabili con ↑ ↓ e OK.
 
-**Non installare questa nuova build come versione definitiva finché GitHub Actions non è verde e il collaudo sul TV non conferma la compatibilità.** La playlist v10 rimane 60 candidati IPTV: la guida 85 LCN non aggiunge segnaposto. Il passaggio DVB richiede un canale memorizzato nell'antenna e il servizio su PC; i siti ufficiali possono non riprodurre video nel browser LG.
+**Non installare questa nuova build come versione definitiva finché GitHub Actions non è verde e il collaudo sul TV non conferma la compatibilità.** La playlist v10 rimane 60 candidati IPTV: la guida 85 LCN non aggiunge segnaposto. Il passaggio DVB richiede un canale memorizzato nell'antenna; la TV riapre il suo ultimo canale nativo, non necessariamente l'LCN evidenziato nella guida. I siti ufficiali possono non riprodurre video nel browser LG.
 
 - [Rapporto completo, limiti e checklist](REPORT_HYBRID_85_LCN_2026-10-24.md)
 - [Procedura bridge locale e controlli di sicurezza](tools/lg-hybrid/README.md)
