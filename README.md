@@ -1,5 +1,8 @@
 # TV Montecrestese IPTV — catalogo LCN Piemonte/VCO
 
+> **Installazione dal Mac (Intel o Apple Silicon)** — non serve un PC Windows. [Guida macOS passo per passo](GUIDA_INSTALLAZIONE_MACOS_LG_HYBRID.md). Il Mac è necessario solo per installare l'IPK; il bridge facoltativo DVB/web si può eseguire sullo stesso Mac, ma deve restare acceso durante i cambi sorgente automatici. L'IPTV e la guida 85 LCN continuano a funzionare con Mac spento.
+
+
 ## Hybrid: audit di codice e prestazioni completato (24/10/2026)
 
 - **[Build verificata #40076719422](https://github.com/archsgio/TV-Montecrestese-IPTV/actions/runs/40076719422)**: 3.428 test passati, 4 saltati, 156 suite; TypeScript, lint, IPK e bundle completati.
