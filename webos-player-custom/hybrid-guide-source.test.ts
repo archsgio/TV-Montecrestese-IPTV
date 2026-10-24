@@ -70,6 +70,20 @@ describe('LG hybrid modal navigation and safety', () => {
     expect(document.querySelector('.hybrid-heading')?.textContent).toContain('002');
   });
 
+  it('reuses the same 85 rendered rows across repeated remote arrows', () => {
+    modal.openCatalog();
+    const firstRow = document.querySelector('.hybrid-list .hybrid-row');
+    const firstList = document.querySelector('.hybrid-list');
+    for (let i = 0; i < 8; i++) {
+      window.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, keyCode: 40 }));
+    }
+    expect(document.querySelector('.hybrid-list')).toBe(firstList);
+    expect(document.querySelector('.hybrid-list .hybrid-row')).toBe(firstRow);
+    expect(document.querySelectorAll('.hybrid-list .hybrid-row')).toHaveLength(85);
+    expect(document.querySelector('.hybrid-row--focus')?.textContent).toContain('009');
+    expect(tune).not.toHaveBeenCalled();
+  });
+
   it('opens the 85-LCN guide focused on the most recently watched LCN', () => {
     localStorage.setItem('montecrestese_last_hybrid_channel_v1',
       JSON.stringify({ source: 'dvb', lcn: 802, at: Date.now() }));
