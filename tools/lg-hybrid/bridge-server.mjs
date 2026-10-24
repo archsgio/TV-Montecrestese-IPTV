@@ -4,16 +4,33 @@
  */
 import http from 'node:http';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import LGTV from 'lgtv2';
 import { privateIPv4, allowedOrigin as trustedOrigin, normalizedChannels, selectTunerChannel, validateAction } from './bridge-core.mjs';
+import { validatedLastSource, nativeTvForeground, currentNativeChannel } from './last-source-state.mjs';
 
 const folder = dirname(fileURLToPath(import.meta.url));
 const reg = JSON.parse(readFileSync(join(folder, 'official-fallbacks.json'), 'utf8'));
 const known = new Map(reg.entries.map(e => [e.lcn, e]));
 const SECRET_FILE = join(folder, '.local-bridge-secret');
+const LAST_FILE = join(folder, '.local-bridge-last-source.json');
+let lastSource = null;
+if (existsSync(LAST_FILE)) {
+  try { lastSource = validatedLastSource(JSON.parse(readFileSync(LAST_FILE, 'utf8'))); }
+  catch (_e) { console.warn('Ultimo canale salvato illeggibile; stato ignorato.'); }
+}
+function rememberLastSource(source, lcn) {
+  const record = validatedLastSource({ source, lcn, at: Date.now() });
+  if (!record) throw Error('Stato ultimo canale non valido');
+  const tempFile = LAST_FILE + '.new';
+  writeFileSync(tempFile, JSON.stringify(record) + '\n', { mode: 0o600 });
+  renameSync(tempFile, LAST_FILE);
+  lastSource = record;
+  return record;
+}
+
 
 const args = process.argv.slice(2);
 const opt = name => args[args.indexOf(name) + 1];
@@ -54,16 +71,17 @@ function send(res, status, body) {
   res.statusCode = status;
   res.end(JSON.stringify(body));
 }
-async function pairAndRequest(task) {
+async function pairAndRequest(task, pairingTimeoutMs = 60000) {
   const tv = new LGTV({ host: tvHost, reconnect: false, timeout: 12000, verifyCert: 'tofu' });
   let handle;
   try {
     await new Promise((resolve, reject) => {
-      handle = setTimeout(() => reject(Error('LG pairing or connection timed out')), 60000);
+      handle = setTimeout(() => reject(Error('LG pairing or connection timed out')), pairingTimeoutMs);
       tv.once('connect', resolve);
       tv.once('error', reject);
       tv.on('prompt', () => console.log('APPROVA la richiesta di controllo sul televisore LG.'));
     });
+    wasPaired = true;
     return await task(tv);
   } finally {
     if (handle) clearTimeout(handle);
@@ -90,6 +108,23 @@ const server = http.createServer(async (request, response) => {
   if (!trustedOrigin(request.headers.origin)) { send(response, 403, { error: 'Origin non autorizzata' }); return; }
   if (request.method === 'OPTIONS') { response.statusCode = 204; response.end(); return; }
   if (!authorized(request)) { send(response, 401, { error: 'Chiave di collegamento errata' }); return; }
+  // Fast lookup: startup never needs to connect to the TV just to read history.
+  if (request.method === 'GET' && request.url === '/v1/last') {
+    send(response, 200, { last: lastSource });
+    return;
+  }
+  if (request.method === 'POST' && request.url === '/v1/remember') {
+    try {
+      const body = await readBody(request);
+      if (!body || body.source !== 'iptv' || !Number.isSafeInteger(body.lcn) ||
+          body.lcn < 1 || body.lcn > 9999) {
+        send(response, 400, { error: 'Si possono registrare solo canali IPTV effettivamente avviati' });
+        return;
+      }
+      send(response, 200, { last: rememberLastSource('iptv', body.lcn) });
+    } catch (e) { send(response, 503, { error: String(e.message || e) }); }
+    return;
+  }
   if (request.method === 'GET' && request.url === '/v1/channels') {
     try {
       const channels = await sequential(() => pairAndRequest(async tv =>
@@ -120,12 +155,37 @@ const server = http.createServer(async (request, response) => {
         await tv.request('ssap://tv/openChannel', payload);
         return 'Canale terrestre ' + action.lcn + ' richiesto alla LG.';
       }));
-      send(response, 200, { message: answer });
+      rememberLastSource(action.action === 'tune' ? 'dvb' : 'web', action.lcn);
+      send(response, 200, { message: answer, last: lastSource });
     } catch (e) { send(response, 503, { error: String(e.message || e) }); }
     return;
   }
   send(response, 404, { error: 'Operazione non prevista' });
 });
+// Observe physical CH+/CH- while native Live TV is in the foreground.
+// Read-only and fail-closed: a stale tuned channel while IPTV/browser runs
+// must NEVER overwrite the real last source. Some firmwares deny the endpoint.
+let polling = false;
+let wasPaired = false;
+async function probeNativeChannel() {
+  if (polling || !wasPaired) return;
+  polling = true;
+  try {
+    const candidate = await sequential(() => pairAndRequest(async tv => {
+      const foreground = await tv.request('ssap://com.webos.applicationManager/getForegroundAppInfo');
+      if (!nativeTvForeground(foreground)) return null;
+      const current = await tv.request('ssap://tv/getCurrentChannel');
+      return currentNativeChannel(current);
+    }, 6500));
+    if (candidate && (lastSource?.source !== 'dvb' || lastSource.lcn !== candidate)) {
+      rememberLastSource('dvb', candidate);
+    }
+  } catch (_e) {
+    // Pairing may be revoked or TV turned off; stop silently until next user command.
+  } finally { polling = false; }
+}
+setInterval(() => { void probeNativeChannel(); }, 20000);
+
 server.requestTimeout = 18000;
 server.listen(8927, bindIP, () => {
   console.log('Montecrestese bridge pronto: http://' + bindIP + ':8927');
