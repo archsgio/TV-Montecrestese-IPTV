@@ -1,7 +1,7 @@
 import { HYBRID_CATALOG, isIptvCandidate, type HybridEntry } from './hybrid-catalog';
 import { savedBridgeConfig, HYBRID_BRIDGE_KEY, validateBridgeConfig, type BridgeConfig } from '../services/hybrid-bridge-config';
 export { validateBridgeConfig } from '../services/hybrid-bridge-config';
-import { getLocalLastHybrid } from '../services/hybrid-last-source';
+import { getLocalLastHybrid, rememberHybrid } from '../services/hybrid-last-source';
 
 type Screen = 'catalog' | 'actions' | 'settings';
 type Command = 'tune' | 'web';
@@ -282,6 +282,9 @@ export class HybridGuide {
       });
       const result: { error?: string; message?: string } = await response.json();
       if (!response.ok) throw new Error(result.error || 'HTTP ' + response.status);
+      // Preserve the last successful source locally too: if the PC is later
+      // offline we must NOT resume an older IPTV channel instead.
+      rememberHybrid(command === 'tune' ? 'dvb' : 'web', entry.lcn);
       this.message = result.message || 'Richiesta inviata alla LG.';
       // No extra back-click after a source switch; LG foreground is changing.
       this.close();
