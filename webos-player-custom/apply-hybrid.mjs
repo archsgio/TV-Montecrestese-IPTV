@@ -17,7 +17,7 @@ function replaceOnce(text, find, repl, name) {
 const files = new Map();
 async function rewrite(path, transform) {
   const abs = join(root, path);
-  const original = await readFile(abs, 'utf8');
+  const original = files.has(abs) ? files.get(abs) : await readFile(abs, 'utf8');
   const changed = transform(original);
   if (original !== changed) files.set(abs, changed);
 }
