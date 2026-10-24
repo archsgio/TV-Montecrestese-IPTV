@@ -37,9 +37,9 @@ export function rememberHybrid(source: HybridSource, lcn: number): void {
   catch (_e) { /* Storage exhaustion must not stop playback. */ }
 }
 
-async function briefRequest(url: string, init: RequestInit): Promise<Response> {
+async function briefRequest(url: string, init: RequestInit, timeoutMs = 1250): Promise<Response> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 1250);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try { return await fetch(url, { ...init, signal: controller.signal }); }
   finally { clearTimeout(timer); }
 }
@@ -49,12 +49,14 @@ export function confirmedIPTVPlaying(lcn: number): void {
   rememberHybrid('iptv', lcn);
   const cfg = savedBridgeConfig();
   if (!cfg) return;
-  // Noncritical best effort. Do not force storage/network I/O on the player.
-  void fetch(cfg.endpoint + '/v1/remember', {
+  // Do not stall playback on a stopped PC; report the media-playing time,
+  // rather than the later arrival order, to protect newer DVB selections.
+  const at = Date.now();
+  void briefRequest(cfg.endpoint + '/v1/remember', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Montecrestese-Key': cfg.token },
-    body: JSON.stringify({ source: 'iptv', lcn }),
-  }).catch(() => {});
+    body: JSON.stringify({ source: 'iptv', lcn, at }),
+  }, 1800).catch(() => {});
 }
 
 /** Read-only reconciliation, never changes channel. */
@@ -87,7 +89,7 @@ export async function restoreExternalLastHybrid(
       headers: { 'Content-Type': 'application/json', 'X-Montecrestese-Key': cfg.token },
       body: JSON.stringify({ action: last.source === 'dvb' ? 'tune' : 'web',
         lcn: last.lcn }),
-    });
+    }, 9500);
     if (!res.ok) return 'external-unavailable';
     rememberHybrid(last.source, last.lcn);
     return 'external-restored';
