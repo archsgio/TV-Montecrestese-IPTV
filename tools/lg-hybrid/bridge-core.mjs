@@ -45,9 +45,3 @@ export function validateAction(body, official) {
   return { action: 'tune', lcn: body.lcn };
 }
 
-export function authorizeHexToken(supplied, expected) {
-  if (typeof supplied !== 'string' || !/^[a-f0-9]{64}$/i.test(supplied)) return false;
-  if (!/^[a-f0-9]{64}$/i.test(expected)) throw Error('Secret corrotto');
-  // Length is verified before timingSafeEqual; compare Buffers in bridge-server.
-  return supplied.toLowerCase() === expected.toLowerCase();
-}
