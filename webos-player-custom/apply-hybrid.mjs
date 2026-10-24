@@ -125,6 +125,38 @@ await rewrite('src/components/channel-list.ts', text => {
     'directory OK action');
   return text;
 });
+// Intentional focus change: even with zero streams, the 85-LCN catalog must
+// remain accessible as the first actionable row on Diretta.
+await rewrite('src/components/channel-list.test.ts', text => {
+  text = replaceOnce(text,
+    "expect(ringed(container.querySelector('.group-item'))).toBe(true);",
+    "expect(ringed(container.querySelector('.montecrestese-catalog-shortcut'))).toBe(true);",
+    'empty list guide focus');
+  text = replaceOnce(text,
+    "  it('initial focus is the first channel when channels exist', () => {",
+    `  it('opens the complete 85-LCN catalog from Diretta with one OK', () => {
+    const onOpenHybridCatalog = vi.fn();
+    list = new ChannelList(container, {
+      onChannelSelect: onSelect,
+      onOpenHybridCatalog,
+    });
+    list.render();
+    const shortcut = container.querySelector<HTMLElement>('.montecrestese-catalog-shortcut');
+    expect(shortcut?.textContent).toContain('85 LCN');
+    expect(shortcut?.dataset.hybridCatalog).toBe('');
+    shortcut?.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 1, clientY: 1 }));
+    // Pointer coordinates are unavailable in jsdom, so focus and OK explicitly.
+    expect(onOpenHybridCatalog).not.toHaveBeenCalled();
+    (list as unknown as { nav: { focus: (element: HTMLElement) => void } })
+      .nav.focus(shortcut!);
+    list.handleAction('select');
+    expect(onOpenHybridCatalog).toHaveBeenCalledOnce();
+  });
+
+  it('initial focus is the first channel when channels exist', () => {`,
+    'guide directory shortcut functional test');
+  return text;
+});
 await rewrite('src/app.ts', text => replaceOnce(text,
   "        onListFocus: () => this.livePreview?.leaveControls(false),",
   "        onListFocus: () => this.livePreview?.leaveControls(false),\n        onOpenHybridCatalog: () => this.hybridGuide.openCatalog(),",
