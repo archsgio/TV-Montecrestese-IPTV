@@ -8,6 +8,7 @@
  * A successful browser launch DOES NOT prove the video on the website played.
  */
 import { lunaRequest, type LunaRequestHandle } from './luna';
+import { HYBRID_CATALOG } from '../components/hybrid-catalog';
 
 export type NativeSource = 'dvb' | 'web';
 export type NativeLaunchResult = { ok: boolean; message: string };
@@ -55,7 +56,8 @@ export function openNativeLiveTv(): Promise<NativeLaunchResult> {
  * from the immutable official-fallbacks-based channel catalog.
  */
 export function openOfficialBrowser(url: string): Promise<NativeLaunchResult> {
-  if (!/^https:\/\//.test(url) || /[\s\u0000-\u001f]/.test(url)) {
+  if (!/^https:\/\//.test(url) || /[\s\u0000-\u001f]/.test(url) ||
+      !HYBRID_CATALOG.some(channel => channel.web === url && !!channel.web)) {
     return Promise.resolve({ ok: false, message: 'Indirizzo ufficiale non valido.' });
   }
   return launchApp(BROWSER_APP, { target: url });
