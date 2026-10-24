@@ -137,7 +137,7 @@ await rewrite('src/app.ts', text => {
 await rewrite('src/components/player.ts', text => {
   text = replaceOnce(text,
     "import { ChannelHealthService } from '../services/channel-health';",
-    "import { ChannelHealthService } from '../services/channel-health';\nimport { confirmedIPTVPlaying } from '../services/hybrid-last-source';\nimport { channelLcn } from '../utils/channel-lcn';",
+    "import { ChannelHealthService } from '../services/channel-health';\nimport { confirmedIPTVPlaying } from '../services/hybrid-last-source';",
     'player resume import');
   text = replaceOnce(text,
     "      this.markTrackedLiveHealthy();",
