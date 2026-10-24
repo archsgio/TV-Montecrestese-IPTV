@@ -85,6 +85,11 @@ await rewrite('index.html', text => replaceOnce(text,
   '<link rel="stylesheet" href="css/virtual-numpad.css">',
   '<link rel="stylesheet" href="css/virtual-numpad.css">\n  <link rel="stylesheet" href="css/hybrid-guide.css">',
   'HTML styles'));
+// The TV's Italian locale may override the root app title: retain our own name
+// in the localized app tile, not only in appinfo.json.
+await rewrite('resources/it/appinfo.json', text => replaceOnce(text,
+  '"title": "webOS IPTV Player"', '"title": "IPTV Montecrestese"',
+  'Italian app title'));
 const sources = [
   ['hybrid-catalog-source.ts', 'src/components/hybrid-catalog.ts'],
   ['hybrid-guide-source.ts', 'src/components/hybrid-guide.ts'],
