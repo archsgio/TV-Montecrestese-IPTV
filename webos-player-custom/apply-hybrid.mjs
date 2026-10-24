@@ -162,10 +162,7 @@ await rewrite('src/components/player.ts', text => {
     'start channel warmup stopwatch');
   text = replaceOnce(text,
     "        confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));",
-    "        // From stream handoff to first real HTML5 'playing' event, not a guessed ETA.\n        const elapsedMs = Math.max(0, Date.now() - this.montecresteseSwitchStart);\n        if (this.montecresteseSwitchStart > 0) {
-          log.info('Montecrestese IPTV channel ready', 'elapsed_ms=' + elapsedMs);
-          this.montecresteseSwitchStart = 0;
-        }\n        confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));",
+    "        // From stream handoff to first real HTML5 'playing' event, not a guessed ETA.\n        const elapsedMs = Math.max(0, Date.now() - this.montecresteseSwitchStart);\n        if (this.montecresteseSwitchStart > 0) {\n          log.info('Montecrestese IPTV channel ready', 'elapsed_ms=' + elapsedMs);\n          this.montecresteseSwitchStart = 0;\n        }\n        confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));",
     'record observed channel startup latency');
   return text;
 });
