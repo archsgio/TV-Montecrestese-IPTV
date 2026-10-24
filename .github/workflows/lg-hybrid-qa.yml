@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: '22'
       - name: Esegui test comportamentali pure dei canali e sicurezza
-        run: node --test tools/lg-hybrid/bridge-core.test.mjs
+        run: node --test tools/lg-hybrid/bridge-core.test.mjs tools/lg-hybrid/last-source-state.test.mjs
       - name: Check ESM syntax (no TV connection)
         run: node --check tools/lg-hybrid/lg-dtt.mjs
       - name: Check optional LAN companion syntax
