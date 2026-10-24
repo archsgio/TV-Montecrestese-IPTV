@@ -171,8 +171,8 @@ await rewrite('index.html', text => replaceOnce(text,
 // Update upstream settings test double to expose the public health record API.
 // The new groups are derived from the same records as the existing counters.
 await rewrite('src/components/settings.test.ts', text => replaceOnce(text,
-  "    healthMock: {\\n      getSummary:",
-  "    healthMock: {\\n      getRecord: vi.fn(() => null),\\n      getSummary:",
+  "    healthMock: {\n      getSummary:",
+  "    healthMock: {\n      getRecord: vi.fn(() => null),\n      getSummary:",
   'health record test double'));
 await rewrite('src/components/virtual-numpad.ts', text => {
   text = replaceOnce(text,
