@@ -3,3 +3,6 @@
 node_modules/
 *.cert
 *.mac
+
+.local-bridge-last-source.json
+.local-bridge-last-source.json.new
