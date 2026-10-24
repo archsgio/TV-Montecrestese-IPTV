@@ -115,7 +115,10 @@ await rewrite('src/app.ts', text => {
           // The last watched channel may be native DVB or official browser.
           const outcome = await restoreExternalLastHybrid(lastHybrid);
           if (outcome === 'external-unavailable') {
-            this.hybridGuide.openForLcn(lastHybrid.lcn);
+            // Native Live TV source is intentionally stored with LCN 0:
+            // it stands for LG's own last tuned channel, not a catalog row.
+            if (lastHybrid.source === 'dvb') this.hybridGuide.openCatalog();
+            else this.hybridGuide.openForLcn(lastHybrid.lcn);
           }
         } else {
           // Existing source-key handling remains the stable fallback when
