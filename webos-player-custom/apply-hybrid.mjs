@@ -148,7 +148,7 @@ await rewrite('src/components/player.ts', text => {
     "      this.markTrackedLiveHealthy();",
     `      this.markTrackedLiveHealthy();
       if (this.liveSessionActive && this.currentChannel && this.currentIndex >= 0
-          && !this.livePreviewMode && !this.catchupInfo && !this.vod) {
+          && !document.hidden && !this.livePreviewMode && !this.catchupInfo && !this.vod) {
         confirmedIPTVPlaying(channelLcn(this.currentChannel, this.currentIndex));
       }`,
     'remember video only when playing');
