@@ -160,16 +160,20 @@ export class HybridGuide {
       this.options.push({
         label: 'Apri TV terrestre LG (ultimo canale sintonizzato)', action: 'tune',
       });
+      // Not a TV channel: keep the browser as an explicitly labeled,
+      // last-resort action. Do not imply that a website equals live playback.
       if (entry.web) this.options.push({
-        label: 'Apri sito ufficiale sulla TV' +
-          (entry.webType === 'official_info' ? ' (informazioni)' : ''), action: 'web',
+        label: entry.webType === 'official_info'
+          ? 'Sito dell’emittente (solo informazioni, fuori dall’app)'
+          : 'Sito ufficiale (alternativa esterna, fuori dall’app)',
+        action: 'web',
       });
       if (this.option >= this.options.length) this.option = 0;
       this.options.forEach((o, i) => this.addButton(root, o.label, this.option === i, () => this.selectOption(i)));
       const hint = document.createElement('p');
       hint.className = 'hybrid-info';
       hint.textContent = entry.kind === 'ESCLUSO_NON_FUNZIONANTE' ? 'Il precedente stream IPTV non funzionava sulla LG.'
-        : entry.kind === 'SENZA_URL' ? 'Manca un flusso IPTV; provare antenna o diretta ufficiale.'
+        : entry.kind === 'SENZA_URL' ? 'Manca un flusso IPTV integrato: il sito esterno non equivale a un canale TV.'
           : 'IPTV conservata come nella playlist v10. Il video dipende dalla sorgente.';
       root.appendChild(hint);
       const limitation = document.createElement('p');
