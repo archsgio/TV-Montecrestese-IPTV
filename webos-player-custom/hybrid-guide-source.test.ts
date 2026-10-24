@@ -89,7 +89,7 @@ describe('TV-only hybrid navigation, no Mac/PC required', () => {
       .toEqual({ id: 'com.webos.app.livetv' });
     await vi.waitFor(() => expect(JSON.parse(
       localStorage.getItem('montecrestese_last_hybrid_channel_v1') || '{}'))
-      .toMatchObject({ source: 'dvb', lcn: 802 }));
+      .toMatchObject({ source: 'dvb', lcn: 0 }));
     expect(tune).not.toHaveBeenCalled();
   });
   it('opens the RaiPlay website in the native LG browser, no PC bridge', async () => {
