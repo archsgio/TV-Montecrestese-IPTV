@@ -211,7 +211,9 @@ export class HybridGuide {
       }
       // This is the last requested source. For native DTT the numeric LCN
       // is NOT independently confirmed: Live TV controls its own tuner.
-      rememberHybrid(command === 'tune' ? 'dvb' : 'web', entry.lcn);
+      // Do not claim the selected catalog LCN is the tuner channel: LG
+      // opens its own last remembered terrestrial channel independently.
+      rememberHybrid(command === 'tune' ? 'dvb' : 'web', command === 'tune' ? 0 : entry.lcn);
       this.close();
     } catch (_e) {
       this.message = 'Impossibile aprire la sorgente dal televisore.';
