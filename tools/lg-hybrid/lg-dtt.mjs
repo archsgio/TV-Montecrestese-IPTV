@@ -4,6 +4,7 @@
 // Requires one TV-side consent prompt for the initial pairing.
 import LGTV from 'lgtv2';
 import { readFileSync } from 'node:fs';
+import { privateIPv4, normalizedChannels, selectTunerChannel } from './bridge-core.mjs';
 
 const APP_ID = 'com.archsgio.iptv';
 const commands = ['--list', '--tune', '--return', '--web'];
@@ -18,14 +19,6 @@ function usage() {
     '\nOnly RFC1918 private IPv4 LAN addresses are accepted.\n' +
     'The first connection requires approval on the TV; no root is required.\n'
   );
-}
-
-function privateIPv4(address) {
-  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(address)) return false;
-  const n = address.split('.').map(Number);
-  if (n.some(v => !Number.isInteger(v) || v < 0 || v > 255)) return false;
-  return n[0] === 10 || (n[0] === 172 && n[1] >= 16 && n[1] <= 31) ||
-    (n[0] === 192 && n[1] === 168);
 }
 
 function parseArgs(args) {
@@ -54,18 +47,6 @@ function parseArgs(args) {
     throw Error('Unexpected option or argument order: use exactly the syntax in --help');
   }
   return { host, command, lcn };
-}
-
-function extractChannels(res) {
-  const list = res?.channelList || res?.channels;
-  if (!Array.isArray(list)) throw Error('LG did not return a tuner channel list (possibly not tuned or permission denied)');
-  return list.map(x => ({
-    channelNumber: String(x.channelNumber ?? ''),
-    channelId: String(x.channelId ?? ''),
-    channelName: String(x.channelName ?? x.channelLabel ?? ''),
-    source: String(x.sourceIndex ?? x.source ?? ''),
-    skipped: Boolean(x.skipped || x.invisible || x.Invisible),
-  })).filter(x => x.channelNumber);
 }
 
 async function run() {
@@ -107,29 +88,24 @@ async function run() {
       return;
     }
 
-    const channels = extractChannels(await tv.request('ssap://tv/getChannelList'));
+    const channels = normalizedChannels(await tv.request('ssap://tv/getChannelList'));
     if (options.command === '--list') {
       console.log('Received ' + channels.length + ' tuned channels from the LG tuner:');
       for (const channel of channels) {
-        console.log(channel.channelNumber.padStart(4, ' ') + '  ' + channel.channelName +
+        console.log(String(channel.lcn).padStart(4, ' ') + '  ' + channel.name +
           (channel.skipped ? ' [skipped]' : ''));
       }
       console.log('Read-only check complete. No channel or app was changed.');
       return;
     }
 
-    const matches = channels.filter(x => x.channelNumber === String(options.lcn) && !x.skipped);
-    if (matches.length !== 1) {
-      throw Error('Expected exactly one tuned, visible channel with LCN ' + options.lcn +
-        ', found ' + matches.length + '. No switch performed.');
-    }
-    const channel = matches[0];
-    const payload = channel.channelId ? { channelId: channel.channelId }
-      : { channelNumber: channel.channelNumber };
+    // Same fail-closed selection rules as the app's bridge.
+    const payload = selectTunerChannel(channels, options.lcn);
+    const channel = channels.find(x => x.lcn === options.lcn && !x.skipped);
     // Only --tune triggers this request; --list is strictly read-only.
     await tv.request('ssap://tv/openChannel', payload);
-    console.log('Requested native LG DVB-T channel ' + channel.channelNumber +
-      ' (' + channel.channelName + '). The IPTV UI may leave the foreground.');
+    console.log('Requested native LG DVB-T channel ' + channel.lcn +
+      ' (' + channel.name + '). The IPTV UI may leave the foreground.');
   } finally {
     if (timer) clearTimeout(timer);
     await tv.disconnect();
