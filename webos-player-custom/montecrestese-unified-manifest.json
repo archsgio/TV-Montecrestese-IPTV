@@ -1,0 +1,144 @@
+{
+  "operations": {
+    "src/components/channel-list.ts": [
+      {
+        "find": "import { PlaylistService } from '../services/playlist-service';",
+        "replace": "import { PlaylistService } from '../services/playlist-service';\nimport { buildUnifiedLcnRows, type UnifiedLcnRow } from './montecrestese-unified-rows';",
+        "note": "model import"
+      },
+      {
+        "find": "  onOpenHybridCatalog?: () => void;",
+        "replace": "  onOpenHybridCatalog?: () => void;\n  onOpenHybridLcn?: (lcn: number) => void;\n  enableUnifiedLcn?: boolean;",
+        "note": "opt-in 85 row options"
+      },
+      {
+        "find": "  private onOpenHybridCatalog: () => void;",
+        "replace": "  private onOpenHybridCatalog: () => void;\n  private onOpenHybridLcn: (lcn: number) => void;\n  private enableUnifiedLcn: boolean;",
+        "note": "opt-in callback fields"
+      },
+      {
+        "find": "      onOpenHybridCatalog = () => {},",
+        "replace": "      onOpenHybridCatalog = () => {},\n      onOpenHybridLcn = (_lcn: number) => {},\n      enableUnifiedLcn = false,",
+        "note": "constructor defaults"
+      },
+      {
+        "find": "    this.onOpenHybridCatalog = onOpenHybridCatalog;",
+        "replace": "    this.onOpenHybridCatalog = onOpenHybridCatalog;\n    this.onOpenHybridLcn = onOpenHybridLcn;\n    this.enableUnifiedLcn = enableUnifiedLcn;",
+        "note": "constructor assignments"
+      },
+      {
+        "find": "  render(ensureFocus = true): void {",
+        "replace": "  private shouldShowUnifiedLcn(): boolean {\n    return this.enableUnifiedLcn && this.currentGroup === 'builtin:all'\n      && !this.currentPlaylist && !this.editor.isChannelEditing\n      && !this.editor.isManagingFavorites;\n  }\n\n  render(ensureFocus = true): void {",
+        "note": "unified mode predicate"
+      },
+      {
+        "find": "    const filteredChannels = PlaylistService.getByGroup(this.currentGroup, this.currentPlaylist || undefined);",
+        "replace": "    const filteredChannels = PlaylistService.getByGroup(this.currentGroup, this.currentPlaylist || undefined);\n    // The 85 positions are a UI model, not a synthetic M3U or PlaylistService mutation.\n    const unifiedRows = this.shouldShowUnifiedLcn()\n      ? buildUnifiedLcnRows(PlaylistService.channels) : null;\n    const displayCount = unifiedRows ? unifiedRows.length : filteredChannels.length;",
+        "note": "presentation rows"
+      },
+      {
+        "find": "    const totalChannels = PlaylistService.getGroupCount(\n      'builtin:all',\n      this.currentPlaylist || undefined,\n    );",
+        "replace": "    const totalChannels = unifiedRows ? unifiedRows.length : PlaylistService.getGroupCount(\n      'builtin:all',\n      this.currentPlaylist || undefined,\n    );",
+        "note": "sidebar count"
+      },
+      {
+        "find": "    let wantedPosition = filteredChannels.findIndex(\n      ch => `ch:${String(PlaylistService.indexOf(ch))}` === wantedKey,\n    );",
+        "replace": "    let wantedPosition = unifiedRows\n      ? unifiedRows.findIndex(row => wantedKey === 'lcn:' + row.entry.lcn\n          || (row.channelIndex >= 0 && wantedKey === 'ch:' + row.channelIndex))\n      : filteredChannels.findIndex(\n        ch => `ch:${String(PlaylistService.indexOf(ch))}` === wantedKey,\n      );",
+        "note": "focus by lcn"
+      },
+      {
+        "find": "      wantedPosition = filteredChannels.findIndex(\n        ch => PlaylistService.indexOf(ch) === this.playingIndex,\n      );",
+        "replace": "      wantedPosition = unifiedRows\n        ? unifiedRows.findIndex(row => row.channelIndex >= 0 && row.channelIndex === this.playingIndex)\n        : filteredChannels.findIndex(\n          ch => PlaylistService.indexOf(ch) === this.playingIndex,\n        );",
+        "note": "focus last playing in unified rows"
+      },
+      {
+        "find": "    const range = this.channelVirtualizer.getRange(filteredChannels.length, viewportHeight);",
+        "replace": "    const range = this.channelVirtualizer.getRange(displayCount, viewportHeight);",
+        "note": "virtualizer count"
+      },
+      {
+        "find": "              : (filteredChannels.length\n                  ? html`",
+        "replace": "              : (displayCount\n                  ? html`",
+        "note": "render with actual 85 count"
+      },
+      {
+        "find": "this.channelVirtualizer.getTotalSize(filteredChannels.length)",
+        "replace": "this.channelVirtualizer.getTotalSize(displayCount)",
+        "note": "virtualizer 85 total size"
+      },
+      {
+        "find": "                      ${filteredChannels.slice(range.start, range.end)\n                        .map((ch, offset) => this.renderChannel(\n                          ch,\n                          favs,\n                          range.start + offset,\n                          this.channelVirtualizer.getItemOffset(range.start + offset),\n                        ))}",
+        "replace": "                      ${unifiedRows\n                        ? unifiedRows.slice(range.start, range.end)\n                          .map((row, offset) => this.renderUnifiedLcnRow(\n                            row, favs, range.start + offset,\n                            this.channelVirtualizer.getItemOffset(range.start + offset),\n                          ))\n                        : filteredChannels.slice(range.start, range.end)\n                          .map((ch, offset) => this.renderChannel(\n                            ch, favs, range.start + offset,\n                            this.channelVirtualizer.getItemOffset(range.start + offset),\n                          ))}",
+        "note": "virtualized 85 render"
+      },
+      {
+        "find": "      playingChannel = this.playingIndex >= 0\n        ? this.container.querySelector<HTMLElement>(`.channel-main [data-channel-index=\"${this.playingIndex}\"]`)\n        : null;",
+        "replace": "      playingChannel = this.playingIndex >= 0\n        ? this.container.querySelector<HTMLElement>(unifiedRows\n          ? '.channel-main [data-unified-lcn=\"' + String(PlaylistService.channels[this.playingIndex]?.channelNumber) + '\"]'\n          : `.channel-main [data-channel-index=\"${this.playingIndex}\"]`)\n        : null;",
+        "note": "find currently playing row"
+      },
+      {
+        "find": "      const target0 = this.container.querySelector<HTMLElement>('.channel-main [data-channel-index]');",
+        "replace": "      const target0 = this.container.querySelector<HTMLElement>(unifiedRows\n        ? '.channel-main [data-unified-lcn]' : '.channel-main [data-channel-index]');",
+        "note": "focus first unified row"
+      },
+      {
+        "find": "        } else if (focused.dataset.channelIndex !== undefined) {",
+        "replace": "        } else if (focused.dataset.unifiedLcn !== undefined) {\n          const lcn = Number(focused.dataset.unifiedLcn);\n          const row = buildUnifiedLcnRows(PlaylistService.channels).find(x => x.entry.lcn === lcn);\n          if (row && row.channelIndex >= 0) {\n            this.markPlaying(row.channelIndex);\n            this.onChannelSelect(row.channelIndex, undefined, this.currentScope(), 'expand-current');\n          } else if (row) this.onOpenHybridLcn(lcn);\n        } else if (focused.dataset.channelIndex !== undefined) {",
+        "note": "OK directly plays sourced IPTV or opens internal source selector"
+      },
+      {
+        "find": "        const index = findChannelIndexByLcn(PlaylistService.channels, event.number);\n        if (index >= 0) {",
+        "replace": "        const index = findChannelIndexByLcn(PlaylistService.channels, event.number);\n        if (index < 0 && this.shouldShowUnifiedLcn()\n            && buildUnifiedLcnRows(PlaylistService.channels).some(row => row.entry.lcn === event.number)) {\n          this.onOpenHybridLcn(event.number);\n        }\n        if (index >= 0) {",
+        "note": "number actions for missing positions"
+      },
+      {
+        "find": "  private channelPosition(globalIdx: number): number {\n    return PlaylistService\n      .getByGroup(this.currentGroup, this.currentPlaylist || undefined)\n      .findIndex(ch => PlaylistService.indexOf(ch) === globalIdx);\n  }",
+        "replace": "  private channelPosition(globalIdx: number): number {\n    if (this.shouldShowUnifiedLcn()) {\n      const number = PlaylistService.channels[globalIdx]?.channelNumber;\n      return typeof number === 'number'\n        ? buildUnifiedLcnRows(PlaylistService.channels)\n          .findIndex(row => row.channelIndex === globalIdx) : -1;\n    }\n    return PlaylistService\n      .getByGroup(this.currentGroup, this.currentPlaylist || undefined)\n      .findIndex(ch => PlaylistService.indexOf(ch) === globalIdx);\n  }",
+        "note": "index mapped into LCN order"
+      },
+      {
+        "find": "    const entry = this.container.querySelector<HTMLElement>('.channel-main [data-channel-index]');",
+        "replace": "    const entry = this.container.querySelector<HTMLElement>(this.shouldShowUnifiedLcn()\n      ? '.channel-main [data-unified-lcn]' : '.channel-main [data-channel-index]');",
+        "note": "enter on first row"
+      },
+      {
+        "find": "    if (key.indexOf('ch:') !== 0 || this.currentGroup === 'builtin:recently-watched') return null;",
+        "replace": "    if (key.indexOf('lcn:') === 0 && this.shouldShowUnifiedLcn()) {\n      const number = Number(key.slice(4));\n      const position = buildUnifiedLcnRows(PlaylistService.channels)\n        .findIndex(row => row.entry.lcn === number);\n      return position < 0 ? null : { list: 'channel', position };\n    }\n    if (key.indexOf('ch:') !== 0 || this.currentGroup === 'builtin:recently-watched') return null;",
+        "note": "focus key for virtual rows"
+      },
+      {
+        "find": "      ?? this.container.querySelector<HTMLElement>('.channel-main [data-channel-index]')\n      ?? this.container.querySelector<HTMLElement>('[data-focusable][data-key]');",
+        "replace": "      ?? this.container.querySelector<HTMLElement>(this.shouldShowUnifiedLcn()\n        ? '.channel-main [data-unified-lcn]' : '.channel-main [data-channel-index]')\n      ?? this.container.querySelector<HTMLElement>('[data-focusable][data-key]');",
+        "note": "default key for LCN rows"
+      },
+      {
+        "find": "    const count = PlaylistService.getGroupCount(\n      this.currentGroup,\n      this.currentPlaylist || undefined,\n    );",
+        "replace": "    const count = this.shouldShowUnifiedLcn() ? 85 : PlaylistService.getGroupCount(\n      this.currentGroup,\n      this.currentPlaylist || undefined,\n    );",
+        "note": "D-pad navigates 85 rows"
+      },
+      {
+        "find": "  private renderChannel(ch: Channel, favs: string[], position: number, top: number): Safe {",
+        "replace": "  private renderUnifiedLcnRow(row: UnifiedLcnRow, favs: string[], position: number, top: number): Safe {\n    const channel = row.channel;\n    const idx = row.channelIndex;\n    const isPlaying = idx >= 0 && idx === this.playingIndex && this.playingCatchupStart === null;\n    const favorite = channel ? favs.includes(channelKey(channel)) : false;\n    const epgId = channel ? EpgService.findChannelId(channel) : null;\n    const nowPlaying = epgId ? EpgService.getNowPlaying(epgId) : null;\n    const state = idx >= 0\n      ? (row.entry.kind === 'CANDIDATO_DA_COLLAUDARE' ? 'IPTV da provare'\n        : row.entry.kind === 'CANDIDATO_SIMULCAST' ? 'IPTV simulcast' : 'IPTV in lista')\n      : row.entry.kind === 'ESCLUSO_NON_FUNZIONANTE'\n        ? 'IPTV già non funzionante' : 'Nessuno stream IPTV verificato';\n    return html`\n      <div class=\"channel-item ${isPlaying ? 'playing' : ''} ${idx < 0 ? 'montecrestese-no-stream' : ''}\"\n           data-key=\"lcn:${row.entry.lcn}\" data-focusable\n           data-unified-lcn=\"${row.entry.lcn}\" data-list-position=\"${position}\" style=\"top:${top}px\">\n        <div class=\"channel-number\">${row.entry.lcn}</div>\n        ${channel ? this.renderLogo(channel) : html`<div class=\"channel-logo-wrap\"><div class=\"channel-logo-placeholder\">${row.entry.name.charAt(0)}</div></div>`}\n        <div class=\"channel-info\">\n          <div class=\"channel-name\">${favorite ? raw(favoriteIcon(true)) : ''}${row.entry.name}</div>\n          <div class=\"channel-now montecrestese-lcn-state\">${state}${nowPlaying ? ' · ' + nowPlaying.title : ''}</div>\n        </div>\n        ${channel ? this.renderHealth(channel) : ''}\n        ${isPlaying ? raw('<div class=\"playing-indicator\">&#9654;</div>') : ''}\n      </div>\n    `;\n  }\n\n  private renderChannel(ch: Channel, favs: string[], position: number, top: number): Safe {",
+        "note": "render LCN-only and IPTV rows without fake channels"
+      }
+    ],
+    "src/app.ts": [
+      {
+        "find": "        onOpenHybridCatalog: () => this.hybridGuide.openCatalog(),",
+        "replace": "        onOpenHybridCatalog: () => this.hybridGuide.openCatalog(),\n        onOpenHybridLcn: (lcn) => this.hybridGuide.openForLcn(lcn),\n        enableUnifiedLcn: true,",
+        "note": "enable unified list only for Montecrestese installation"
+      }
+    ],
+    "src/components/channel-list.test.ts": [
+      {
+        "find": "      expect(list.focusScope.concealed).toBe(false);\n    } finally {\n      bar.dispose();\n    }\n  });\n});\n",
+        "replace": "      expect(list.focusScope.concealed).toBe(false);\n    } finally {\n      bar.dispose();\n    }\n  });\n});\n\n\ndescribe('Montecrestese opt-in unified LCN directory', () => {\n  it('shows 85 virtual positions in Diretta, with one OK for IPTV and safe fallback for TV8/Videogruppo', () => {\n    const original = data.channels.map(ch => ch.channelNumber);\n    data.channels[0].channelNumber = 13;\n    data.channels[1].channelNumber = 83;\n    data.channels[2].channelNumber = 6;\n    const onOpenHybridLcn = vi.fn();\n    try {\n      list = new ChannelList(container, {\n        onChannelSelect: onSelect, onOpenHybridLcn, enableUnifiedLcn: true,\n      });\n      list.render();\n      expect(container.querySelector('.channel-count')?.textContent).toContain('85');\n      expect(container.querySelector('.channel-list-spacer')?.getAttribute('style')).toContain('height:');\n      const tv8 = container.querySelector<HTMLElement>('[data-unified-lcn=\"8\"]');\n      const videogruppo = container.querySelector<HTMLElement>('[data-unified-lcn=\"12\"]');\n      expect(tv8?.textContent).toContain('TV8');\n      expect(videogruppo?.textContent).toContain('Videogruppo');\n      (list as unknown as { nav: { focus: (el: HTMLElement) => void } }).nav.focus(tv8!);\n      list.handleAction('select');\n      expect(onOpenHybridLcn).toHaveBeenCalledWith(8);\n      expect(onSelect).not.toHaveBeenCalled();\n      const rete7 = container.querySelector<HTMLElement>('[data-unified-lcn=\"13\"]');\n      (list as unknown as { nav: { focus: (el: HTMLElement) => void } }).nav.focus(rete7!);\n      list.handleAction('select');\n      expect(onSelect).toHaveBeenCalledWith(0, undefined, expect.anything(), 'expand-current');\n      expect(onOpenHybridLcn).toHaveBeenCalledTimes(1);\n    } finally {\n      data.channels.forEach((ch, i) => {\n        if (original[i] === undefined) delete ch.channelNumber;\n        else ch.channelNumber = original[i];\n      });\n    }\n  });\n});\n",
+        "note": "regression actual full-list 85 LCN + TV8/Videogruppo + OK IPTV"
+      }
+    ]
+  },
+  "create": {
+    "montecrestese-unified-rows-source.ts": "src/components/montecrestese-unified-rows.ts",
+    "montecrestese-unified-rows-source.test.ts": "src/components/montecrestese-unified-rows.test.ts"
+  }
+}

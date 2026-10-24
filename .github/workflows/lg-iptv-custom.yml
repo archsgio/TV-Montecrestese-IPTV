@@ -37,6 +37,10 @@ jobs:
         run: node webos-player-custom/apply-hybrid.mjs upstream-player --dry-run
       - name: Integra selezione IPTV / antenna / dirette ufficiali
         run: node webos-player-custom/apply-hybrid.mjs upstream-player
+      - name: Verifica integrazione Diretta 85 LCN senza scrivere
+        run: node webos-player-custom/apply-unified-lcn.mjs upstream-player --dry-run
+      - name: Applica integrazione Diretta 85 LCN
+        run: node webos-player-custom/apply-unified-lcn.mjs upstream-player
       - name: Installa dipendenze e CLI LG
         run: |
           cd upstream-player
