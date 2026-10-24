@@ -71,22 +71,41 @@ function send(res, status, body) {
   res.statusCode = status;
   res.end(JSON.stringify(body));
 }
-async function pairAndRequest(task, pairingTimeoutMs = 60000) {
-  const tv = new LGTV({ host: tvHost, reconnect: false, timeout: 12000, verifyCert: 'tofu' });
-  let handle;
-  try {
-    await new Promise((resolve, reject) => {
-      handle = setTimeout(() => reject(Error('LG pairing or connection timed out')), pairingTimeoutMs);
-      tv.once('connect', resolve);
-      tv.once('error', reject);
-      tv.on('prompt', () => console.log('APPROVA la richiesta di controllo sul televisore LG.'));
+// Retain the authorized SSAP socket instead of reconnecting for each channel
+// switch or each native-TV sample. One connection can serve many fast requests.
+let pairedSession = null;
+let pairingPromise = null;
+let wasPaired = false;
+function connectedTv(pairingTimeoutMs = 12000) {
+  if (pairedSession) return Promise.resolve(pairedSession);
+  if (pairingPromise) return pairingPromise;
+  const client = new LGTV({ host: tvHost, reconnect: false, timeout: 9000, verifyCert: 'tofu' });
+  pairingPromise = new Promise((resolve, reject) => {
+    let settled = false;
+    const deadline = setTimeout(() => finish(Error('LG pairing/connection timed out')), pairingTimeoutMs);
+    function finish(error) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(deadline);
+      if (error) { try { client.disconnect(); } catch (_e) {} reject(error); }
+      else { pairedSession = client; wasPaired = true; resolve(client); }
+    }
+    client.on('connect', () => finish(null));
+    client.on('prompt', () => console.log('Approva il collegamento LG sul televisore.'));
+    client.on('error', error => {
+      if (pairedSession === client) pairedSession = null;
+      finish(error);
     });
-    wasPaired = true;
-    return await task(tv);
-  } finally {
-    if (handle) clearTimeout(handle);
-    await tv.disconnect();
-  }
+    client.on('close', () => {
+      if (pairedSession === client) pairedSession = null;
+      finish(Error('Socket LG chiuso'));
+    });
+  }).finally(() => { pairingPromise = null; });
+  return pairingPromise;
+}
+async function pairAndRequest(task, pairingTimeoutMs = 12000) {
+  const tv = await connectedTv(pairingTimeoutMs);
+  return task(tv);
 }
 async function readBody(request) {
   let raw = '';
@@ -184,7 +203,7 @@ async function probeNativeChannel() {
     // Pairing may be revoked or TV turned off; stop silently until next user command.
   } finally { polling = false; }
 }
-setInterval(() => { void probeNativeChannel(); }, 20000);
+setInterval(() => { void probeNativeChannel(); }, 8000);
 
 server.requestTimeout = 18000;
 server.listen(8927, bindIP, () => {
@@ -193,4 +212,10 @@ server.listen(8927, bindIP, () => {
   console.log('Chiave locale (da digitare SOLO nella app IPTV): ' + token);
   console.log('File chiave privata: ' + SECRET_FILE);
   console.log('NON esporre la porta 8927 su Internet o verso reti pubbliche.');
+  // First pairing is initiated once at service startup; subsequent channel
+  // changes reuse the socket. The user must approve the TV prompt.
+  void sequential(() => pairAndRequest(tv => tv.request(
+    'ssap://com.webos.applicationManager/getForegroundAppInfo', {}), 20000))
+    .then(() => { void probeNativeChannel(); })
+    .catch(() => { console.warn('LG non disponibile: il bridge resta in attesa di un comando.'); });
 });
