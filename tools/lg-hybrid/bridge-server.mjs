@@ -8,19 +8,13 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import LGTV from 'lgtv2';
+import { privateIPv4, allowedOrigin as trustedOrigin, normalizedChannels, selectTunerChannel, validateAction } from './bridge-core.mjs';
 
 const folder = dirname(fileURLToPath(import.meta.url));
 const reg = JSON.parse(readFileSync(join(folder, 'official-fallbacks.json'), 'utf8'));
 const known = new Map(reg.entries.map(e => [e.lcn, e]));
 const SECRET_FILE = join(folder, '.local-bridge-secret');
 
-function privateIP(value) {
-  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(value)) return false;
-  const n = value.split('.').map(Number);
-  if (n.some(v => v < 0 || v > 255)) return false;
-  return n[0] === 10 || n[0] === 192 && n[1] === 168 ||
-    n[0] === 172 && n[1] >= 16 && n[1] <= 31;
-}
 const args = process.argv.slice(2);
 const opt = name => args[args.indexOf(name) + 1];
 if (args.length !== 4 || !args.includes('--tv') || !args.includes('--bind')) {
@@ -29,7 +23,7 @@ if (args.length !== 4 || !args.includes('--tv') || !args.includes('--bind')) {
   process.exit(2);
 }
 const tvHost = opt('--tv'), bindIP = opt('--bind');
-if (!privateIP(tvHost) || !privateIP(bindIP) || tvHost === bindIP) {
+if (!privateIPv4(tvHost) || !privateIPv4(bindIP) || tvHost === bindIP) {
   console.error('Refusing public, invalid or identical PC/TV IPv4 address.');
   process.exit(2);
 }
@@ -43,12 +37,6 @@ function authorized(request) {
   const supplied = request.headers['x-montecrestese-key'];
   if (typeof supplied !== 'string' || !/^[a-f0-9]{64}$/.test(supplied)) return false;
   return timingSafeEqual(Buffer.from(supplied, 'hex'), Buffer.from(token, 'hex'));
-}
-function allowedOrigin(request) {
-  // Installed LG webOS apps can report Origin: null OR the unique
-  // file://<app-id> security origin. Never allow generic Internet origins.
-  const origin = request.headers.origin;
-  return !origin || origin === 'null' || origin === 'file://com.archsgio.iptv';
 }
 function headers(response, req) {
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -82,16 +70,6 @@ async function pairAndRequest(task) {
     await tv.disconnect();
   }
 }
-function normalizedChannels(res) {
-  const list = res?.channelList || res?.channels;
-  if (!Array.isArray(list)) throw Error('La LG non ha restituito la lista canali');
-  return list.map(ch => ({
-    lcn: Number(ch.channelNumber),
-    name: String(ch.channelName ?? ch.channelLabel ?? ''),
-    channelId: String(ch.channelId ?? ''),
-    skipped: !!(ch.skipped || ch.invisible || ch.Invisible),
-  })).filter(ch => Number.isSafeInteger(ch.lcn) && ch.lcn > 0 && ch.lcn <= 9999);
-}
 async function readBody(request) {
   let raw = '';
   for await (const chunk of request) {
@@ -109,7 +87,7 @@ function sequential(callback) {
 }
 const server = http.createServer(async (request, response) => {
   headers(response, request);
-  if (!allowedOrigin(request)) { send(response, 403, { error: 'Origin non autorizzata' }); return; }
+  if (!trustedOrigin(request.headers.origin)) { send(response, 403, { error: 'Origin non autorizzata' }); return; }
   if (request.method === 'OPTIONS') { response.statusCode = 204; response.end(); return; }
   if (!authorized(request)) { send(response, 401, { error: 'Chiave di collegamento errata' }); return; }
   if (request.method === 'GET' && request.url === '/v1/channels') {
@@ -125,27 +103,22 @@ const server = http.createServer(async (request, response) => {
   if (request.method === 'POST' && request.url === '/v1/action') {
     try {
       const body = await readBody(request);
-      if (!body || !Number.isSafeInteger(body.lcn) || body.lcn < 1 || body.lcn > 9999
-          || !['tune', 'web'].includes(body.action)) {
-        send(response, 400, { error: 'Comando non valido' }); return;
-      }
-      const chosen = body.lcn, selected = known.get(chosen);
-      if (body.action === 'web' && (!selected || !selected.url.startsWith('https://'))) {
-        send(response, 404, { error: 'Nessun sito ufficiale approvato per questa LCN' }); return;
+      let action;
+      try { action = validateAction(body, known); }
+      catch (e) {
+        const message = String(e.message || e);
+        send(response, message.startsWith('Comando') ? 400 : 404, { error: message });
+        return;
       }
       const answer = await sequential(() => pairAndRequest(async tv => {
-        if (body.action === 'web') {
-          await tv.request('ssap://system.launcher/open', { target: selected.url });
+        if (action.action === 'web') {
+          await tv.request('ssap://system.launcher/open', { target: action.url });
           return 'Richiesta di apertura sito ufficiale inviata. Riproduzione web non garantita.';
         }
         const channels = normalizedChannels(await tv.request('ssap://tv/getChannelList'));
-        const matches = channels.filter(ch => ch.lcn === chosen && !ch.skipped);
-        if (matches.length !== 1) throw Error('Canale DVB ' + chosen +
-          ' non identificato univocamente nel tuner LG (' + matches.length + ' corrispondenze)');
-        const ch = matches[0];
-        await tv.request('ssap://tv/openChannel', ch.channelId ?
-          { channelId: ch.channelId } : { channelNumber: String(ch.lcn) });
-        return 'Canale terrestre ' + chosen + ' richiesto alla LG.';
+        const payload = selectTunerChannel(channels, action.lcn);
+        await tv.request('ssap://tv/openChannel', payload);
+        return 'Canale terrestre ' + action.lcn + ' richiesto alla LG.';
       }));
       send(response, 200, { message: answer });
     } catch (e) { send(response, 503, { error: String(e.message || e) }); }
