@@ -106,6 +106,58 @@ describe('LG hybrid modal navigation and safety', () => {
     expect(document.querySelector('.hybrid-guide')).toBeNull();
   });
 
+  it('only sends DVB switch after explicit configured user action', async () => {
+    const network = vi.fn().mockResolvedValueOnce({
+      ok: true, json: async () => ({ channels: [{ lcn: 802, name: 'Rai 3 Piemonte' }] }),
+    }).mockResolvedValueOnce({
+      ok: true, json: async () => ({ message: 'Comando inviato' }),
+    });
+    vi.stubGlobal('fetch', network);
+    modal.openForLcn(802);
+    expect(network).not.toHaveBeenCalled();
+    (Array.from(document.querySelectorAll('button.hybrid-row'))
+      .find(x => x.textContent?.includes('TV terrestre')) as HTMLButtonElement).click();
+    expect(network).not.toHaveBeenCalled();
+    (document.querySelector('#hybrid-endpoint') as HTMLInputElement).value =
+      'http://192.168.1.10:8927';
+    (document.querySelector('#hybrid-token') as HTMLInputElement).value = token;
+    (Array.from(document.querySelectorAll('button.hybrid-row'))
+      .find(x => x.textContent?.includes('Salva')) as HTMLButtonElement).click();
+    await vi.waitFor(() => expect(network).toHaveBeenCalledTimes(1));
+    expect(network.mock.calls[0][0]).toBe('http://192.168.1.10:8927/v1/channels');
+    expect(network.mock.calls[0][1].headers['X-Montecrestese-Key']).toBe(token);
+    expect(tune).not.toHaveBeenCalled();
+    (Array.from(document.querySelectorAll('button.hybrid-row'))
+      .find(x => x.textContent?.includes('TV terrestre')) as HTMLButtonElement).click();
+    await vi.waitFor(() => expect(network).toHaveBeenCalledTimes(2));
+    expect(network.mock.calls[1][0]).toBe('http://192.168.1.10:8927/v1/action');
+    expect(JSON.parse(network.mock.calls[1][1].body)).toEqual({ action: 'tune', lcn: 802 });
+  });
+
+  it('official broadcaster click sends LCN, never arbitrary URL', async () => {
+    const network = vi.fn().mockResolvedValueOnce({
+      ok: true, json: async () => ({ channels: [] }),
+    }).mockResolvedValueOnce({
+      ok: true, json: async () => ({ message: 'Sito aperto' }),
+    });
+    vi.stubGlobal('fetch', network);
+    modal.openForLcn(57);
+    (Array.from(document.querySelectorAll('button.hybrid-row'))
+      .find(x => x.textContent?.includes('Configura')) as HTMLButtonElement).click();
+    (document.querySelector('#hybrid-endpoint') as HTMLInputElement).value =
+      'http://192.168.1.10:8927';
+    (document.querySelector('#hybrid-token') as HTMLInputElement).value = token;
+    (Array.from(document.querySelectorAll('button.hybrid-row'))
+      .find(x => x.textContent?.includes('Salva')) as HTMLButtonElement).click();
+    await vi.waitFor(() => expect(network).toHaveBeenCalledTimes(1));
+    (Array.from(document.querySelectorAll('button.hybrid-row'))
+      .find(x => x.textContent?.includes('sito ufficiale')) as HTMLButtonElement).click();
+    await vi.waitFor(() => expect(network).toHaveBeenCalledTimes(2));
+    expect(JSON.parse(network.mock.calls[1][1].body)).toEqual({ action: 'web', lcn: 57 });
+    expect(network.mock.calls[1][1].body).not.toContain('raiplay.it');
+    expect(tune).not.toHaveBeenCalled();
+  });
+
   it('refuses invalid bridge credentials without network request', () => {
     const network = vi.fn();
     vi.stubGlobal('fetch', network);
