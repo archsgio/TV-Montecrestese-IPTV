@@ -242,6 +242,7 @@ const sources = [
   ['hybrid-guide.css', 'css/hybrid-guide.css'],
   ['hybrid-guide-source.test.ts', 'src/components/hybrid-guide.test.ts'],
   ['montecrestese-living-room.test.ts', 'src/services/montecrestese-living-room.test.ts'],
+  ['hybrid-bridge-config.ts', 'src/services/hybrid-bridge-config.ts'],
   ['hybrid-last-source.ts', 'src/services/hybrid-last-source.ts'],
   ['hybrid-last-source.test.ts', 'src/services/hybrid-last-source.test.ts'],
   ['channel-health-issues-source.ts', 'src/components/channel-health-issues.ts'],
