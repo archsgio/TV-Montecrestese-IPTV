@@ -41,6 +41,14 @@ describe('TV-only last source - never requires Mac or PC', () => {
     expect(chooseLastHybrid(newer, old)).toEqual(newer);
   });
 
+  it('represents native LG tuner return without inventing the tuned LCN', () => {
+    expect(validateLastHybrid(source('dvb', 0, Date.now()))).toMatchObject({
+      source: 'dvb', lcn: 0,
+    });
+    expect(validateLastHybrid(source('iptv', 0, Date.now()))).toBeNull();
+    expect(validateLastHybrid(source('web', 0, Date.now()))).toBeNull();
+  });
+
   it('reads history from the TV local storage without network or bridge configuration', async () => {
     const last = source('dvb', 802, Date.now() - 2000);
     localStorage.setItem(key, JSON.stringify(last));
