@@ -1,0 +1,30 @@
+/* Details are below the existing health counters; healthy streams are not repeated. */
+.channel-health-issues { margin-top: 18px; }
+.channel-health-issue-group { margin-top: 12px; }
+.channel-health-issue-label {
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 7px;
+}
+.channel-health-issue-group.suspect .channel-health-issue-label { color: var(--warning); }
+.channel-health-issue-group.unavailable .channel-health-issue-label { color: var(--danger); }
+.channel-health-issue-list {
+  max-height: 270px;
+  overflow-y: auto;
+  padding-left: 6px;
+  padding-right: 12px;
+}
+.channel-health-issue {
+  padding: 6px 0;
+  color: var(--text-primary);
+  font-size: 18px;
+  line-height: 1.4;
+  border-bottom: 1px solid var(--border);
+}
+.channel-health-issue-lcn {
+  display: inline-block;
+  min-width: 60px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
