@@ -92,6 +92,11 @@ await rewrite('src/services/playlist-service.ts', text => {
     'preserve distinct LCN simulcasts insertion');
   return text;
 });
+// Regression: a simulcast URL may belong to multiple legitimate broadcast LCNs.
+await rewrite('src/services/playlist-service.test.ts', text => replaceOnce(text,
+  "  it('merges playlists and de-duplicates channels by URL', async () => {",
+  "  it('retains both LCN 13 and 83 when the source is one simulcast URL', async () => {\n    storageMock.getPlaylists.mockReturnValue([\n      { id: 'v10', name: 'Montecrestese', url: 'http://home/montecrestese.m3u' },\n    ]);\n    fetchTextMock.mockResolvedValue(\n      '#EXTM3U\\n'\n      + '#EXTINF:-1 tvg-chno=\"13\",013 Rete 7 Piemonte\\n'\n      + 'https://example.org/rete7.m3u8\\n'\n      + '#EXTINF:-1 tvg-chno=\"83\",083 Piemonte+\\n'\n      + 'https://example.org/rete7.m3u8',\n    );\n    const channels = await PlaylistService.refresh();\n    expect(channels.map(c => c.channelNumber)).toEqual([13, 83]);\n    expect(channels.map(c => c.name)).toEqual(['013 Rete 7 Piemonte', '083 Piemonte+']);\n    expect(channels).toHaveLength(2);\n  });\n\n  it('merges playlists and de-duplicates channels by URL', async () => {",
+  'test unique LCN simulcast'));
 // Accessible directly from Diretta, no need to open IPTV fullscreen first.
 await rewrite('src/components/channel-list.ts', text => {
   text = replaceOnce(text,
