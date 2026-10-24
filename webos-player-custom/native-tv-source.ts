@@ -39,8 +39,20 @@ function launchApp(id: string, params?: { target: string }): Promise<NativeLaunc
           finish(false, response.errorText || 'Operazione rifiutata dalla TV.');
         } else finish(true, 'Applicazione nativa richiesta.');
       },
-      onFailure: response => finish(false,
-        response.errorText || 'La TV non consente di aprire questa sorgente.'),
+      onFailure: response => {
+        // LG documents -104 when Developer Mode apps try to launch a
+        // privileged built-in app. This is a platform block, not an IPTV bug.
+        if (response.errorCode === -104) {
+          finish(false, 'webOS blocca l’apertura diretta della TV terrestre ' +
+            '(permesso -104). Premi HOME e apri TV/Live TV dal telecomando.');
+        } else if (response.errorCode === -101) {
+          finish(false, 'App nativa non trovata su questa LG. Usa HOME e ' +
+            'seleziona TV terrestre dalla schermata principale.');
+        } else {
+          finish(false, response.errorText ||
+            'La TV non consente di aprire questa sorgente.');
+        }
+      },
     });
   });
 }
