@@ -10,8 +10,8 @@
 .channel-health-issue-group.suspect .channel-health-issue-label { color: var(--warning); }
 .channel-health-issue-group.unavailable .channel-health-issue-label { color: var(--danger); }
 .channel-health-issue-list {
-  max-height: 270px;
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   padding-left: 6px;
   padding-right: 12px;
 }
