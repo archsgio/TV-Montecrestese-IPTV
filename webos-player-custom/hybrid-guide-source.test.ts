@@ -141,6 +141,8 @@ describe('LG hybrid modal navigation and safety', () => {
     await vi.waitFor(() => expect(network).toHaveBeenCalledTimes(2));
     expect(network.mock.calls[1][0]).toBe('http://192.168.1.10:8927/v1/action');
     expect(JSON.parse(network.mock.calls[1][1].body)).toEqual({ action: 'tune', lcn: 802 });
+    await vi.waitFor(() => expect(JSON.parse(localStorage.getItem('montecrestese_last_hybrid_channel_v1') || '{}'))
+      .toMatchObject({ source: 'dvb', lcn: 802 }));
   });
 
   it('official broadcaster click sends LCN, never arbitrary URL', async () => {
@@ -164,6 +166,8 @@ describe('LG hybrid modal navigation and safety', () => {
     await vi.waitFor(() => expect(network).toHaveBeenCalledTimes(2));
     expect(JSON.parse(network.mock.calls[1][1].body)).toEqual({ action: 'web', lcn: 57 });
     expect(network.mock.calls[1][1].body).not.toContain('raiplay.it');
+    await vi.waitFor(() => expect(JSON.parse(localStorage.getItem('montecrestese_last_hybrid_channel_v1') || '{}'))
+      .toMatchObject({ source: 'web', lcn: 57 }));
     expect(tune).not.toHaveBeenCalled();
   });
 
